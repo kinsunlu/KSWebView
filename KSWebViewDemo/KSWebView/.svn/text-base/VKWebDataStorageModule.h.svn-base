@@ -1,0 +1,34 @@
+//
+//  VKWebDataStorageModule.h
+//  vKan
+//
+//  Created by kinsun on 2017/12/29.
+//  Copyright © 2017年 FengCaiRuiYuan. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@class VKWebViewScriptHandler;
+@interface VKWebDataStorageModule : NSObject
+
+@property (nonatomic, readonly, class) NSDictionary <NSString*,VKWebViewScriptHandler*>*scriptHandlers;
+
++(void)setValue:(NSString*)value forKey:(NSString*)key;
++(NSString*)valueForKey:(NSString*)key;
+
++(void)addObserver:(id)observer callback:(void(^)(NSString *value, NSString *oldValue))callback forKeyPath:(NSString*)keyPath;
++(void)removeObserver:(id)observer forKeyPath:(NSString*)keyPath;
++(void)removeObserver:(id)observer;
+
++(void)setOperationAdditionalData:(NSDictionary*)data;
++(NSString*)dataStorageKeyFormTitle:(NSString*)title base_id:(NSString*)base_id;
+
++(NSString*)commentCountKeyWithArticleID:(NSString*)articleID;
++(void)setCommentCount:(NSString*)commentCount article_id:(NSString*)article_id;
++(NSString*)commentCountForArticle_id:(NSString*)article_id;
+
++(NSString*)includeStatusKeyWithArticleID:(NSString*)articleID;
++(void)setIncludeStatus:(NSString*)includeStatus article_id:(NSString*)article_id;
++(NSString*)includeStatusForArticle_id:(NSString*)article_id;
+
+@end

@@ -1,0 +1,48 @@
+//
+//  VKWebView.h
+//  vKan
+//
+//  Created by kinsun on 17/5/3.
+//  Copyright © 2017年 FengCaiRuiYuan. All rights reserved.
+//
+
+#define k_BlankPage @"about:blank"
+#define k_WebViewDidAppear @"viewDidAppearOnApp"
+#define k_WebViewDidDisappear @"viewDidDisappearOnApp"
+
+#import <WebKit/WebKit.h>
+#import "VKWebViewScriptHandler.h"
+#import "VKWebViewReflectiveService.h"
+#import "VKWebViewOperationCenter.h"
+
+@interface VKWebView : WKWebView
+
+@property (nonatomic, strong) NSDictionary <NSString*,VKWebViewScriptHandler*>*scriptHandlers;
+@property (nonatomic, strong) NSArray <NSString*>*cssArray;
+@property (nonatomic, strong) NSDictionary <NSString*,NSString*>*HTTPHeaders;
+@property (nonatomic, weak, readonly) UIView *progressView;
+@property (nonatomic, weak, readonly) UIView *webContentView;
+//@property (nonatomic, assign) CGFloat addWebContentHeight;
+@property (nonatomic, copy) void (^webViewTitleChangedCallback)(NSString *title);
+
++(instancetype)safelyReleaseWebViewWithFrame:(CGRect)frame delegate:(id<WKNavigationDelegate>)delegate;
+-(instancetype)initWithFrame:(CGRect)frame delegate:(id<WKNavigationDelegate>)delegate;
+-(void)loadWebViewWithURL:(NSString*)url params:(NSDictionary*)params;
+-(void)loadWebViewWithFilePath:(NSString *)filePath;
+
+-(WKNavigation *)loadRequest:(NSMutableURLRequest *)request;
+
+-(void)resetProgressView;
+-(void)evaluateJavaScriptMethod:(NSString*)methodName completionHandler:(void (^)(id returnValue, NSError *error))completionHandler;
+
+-(void)webViewBeginScreenshot;//截图前调用一下
+-(void)webViewEndScreenshot;//截图后调用一下
+
+//视频相关
+-(void)videoPlayerCount:(void(^)(NSUInteger))callback;
+-(void)videoDurationWithIndex:(NSUInteger)index callback:(void(^)(double))callback;
+-(void)videoCurrentTimeWithIndex:(NSUInteger)index callback:(void(^)(double))callback;
+-(void)playVideoWithIndex:(NSUInteger)index;
+-(void)pausePlayingVideo;
+
+@end

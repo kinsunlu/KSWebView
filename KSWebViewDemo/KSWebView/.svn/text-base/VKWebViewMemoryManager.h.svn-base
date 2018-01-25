@@ -1,0 +1,16 @@
+//
+//  VKWebViewMemoryManager.h
+//  vKan
+//
+//  Created by kinsun on 2018/1/18.
+//  Copyright © 2018年 FengCaiRuiYuan. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@class VKWebView;
+@interface VKWebViewMemoryManager : NSObject
+
++(void)addWebView:(VKWebView*)webView;
+
+@end

@@ -1,0 +1,18 @@
+//
+//  VKWebViewOperationCenter.h
+//  vKan
+//
+//  Created by kinsun on 2017/11/21.
+//  Copyright © 2017年 FengCaiRuiYuan. All rights reserved.
+//
+
+#define k_CallOperation  @"callOperation"
+
+#import <Foundation/Foundation.h>
+
+@class WKScriptMessage;
+@interface VKWebViewOperationCenter : NSObject
+
++(void)webViewOperationWithController:(VKBaseViewController*)controller message:(WKScriptMessage*)message;
+
+@end

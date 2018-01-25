@@ -1,0 +1,148 @@
+<html>
+    <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=contain">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+<meta content="telephone=no" name="format-detection">
+<meta content="email=no" name="format-detection">
+    <title>KSWebViewDemo</title>
+    <style>
+        div {
+            display:block;
+            font-size:10px;
+        }
+        input {
+            display:block;
+            margin-top:10px;
+            width:100%;
+            height:30px;
+            font-size:10px;
+        }
+    button {
+        margin-top:10px;
+        width:100%;
+        height:30px;
+        background:#eb2547;
+        font-size:10px;
+        color:#ffffff;
+    }
+    </style>
+    </head>
+    <body>
+        <div id="label"></div>
+        <div id="label1"></div>
+        <div id="label2"></div>
+        <button onclick="testJS(this)">测试JS调用原生</button>
+        <button onclick="testGetReturn(this)">测试JS调用原生后拿返回值</button>
+        <button onclick="openNewPage(this)">打开一个新页面</button>
+        <input type="text" id='settingValueInput' value='18'></input>
+        <button onclick="setValue(this)">上面输入的值设置给key为token的储存空间</button>
+        <button onclick="getValue(this)">获取储存中key为token的值</button>
+        <button onclick="addObserver(this)">监听token的值变化回调给JS的observerCallback方法</button>
+        <button onclick="removeObserver(this)">移除对token的监听</button>
+        <button onclick="removeCurrentObserver(this)">移除对当前所有的监听</button>
+        <button onclick="reInit(this)">初始化数据储存模块中的数据但不移除监听(慎用)</button>
+        <button onclick="testReflection(this)">测试H5反射原生</button>
+    </body>
+</html>
+<script>
+    function testJS(obj) {
+        window.control.call('testJSCallback');
+    }
+
+function testGetReturn(obj) {
+    var returnValue = window.control.call('testReturnValue');
+    window.control.call('alert',returnValue);
+}
+
+function openNewPage(obj) {
+    window.control.call('openNewPage');
+}
+
+function setValue(obj) {
+    var value = document.getElementById('settingValueInput').value;
+    var json = {
+        key:'token',
+        value:value
+    }
+    window.control.call('setValue',JSON.stringify(json));
+}
+
+function getValue(obj) {
+    var json = {
+        key:'token',
+    }
+    var value = window.control.call('getValue',JSON.stringify(json));
+    window.control.call('alert',value);
+}
+
+function addObserver(obj) {
+    var json = {
+        key:'token',
+        method_name:'observerCallback'
+    }
+    window.control.call('addObserver',JSON.stringify(json));
+}
+
+function removeObserver(obj) {
+    var json = {
+        key:'token',
+    }
+    window.control.call('removeObserver',JSON.stringify(json));
+}
+
+function removeCurrentObserver(obj) {
+    window.control.call('removeCurrentObserver');
+}
+
+function reInit(obj) {
+    window.control.call('reInit');
+}
+
+function observerCallback(params) {//监听token时定义的方法
+    var value = params[0];
+    var oldValue = params[1];
+    var desc = 'token的值发生了变化,变化为'+value;
+    if (oldValue) {
+        desc += ',变化前的值为'+oldValue;
+    }
+    var logString = 'observerCallback被调用.'+desc;
+    document.getElementById("label").innerText = logString;
+}
+
+function viewDidAppearOnApp(params) {//无需注册,当前页面显示时调用
+    document.getElementById("label1").innerText = '当前网页已经在App屏幕中了';
+}
+
+function viewDidDisappearOnApp(params) {//无需注册,当前页面消失时调用
+    document.getElementById("label2").innerText = '当前网页已经不在App屏幕中了';
+}
+
+function testReflection(params) {//反射调用示例
+    var json = [{"className":"UIView","selectorString":"alloc","instructionType":"class_selector","selectorReturnValueName":"view"},{"selectorParams":[{"type":"basic_data","data":"{{200,200},{200,200}}","basicDataType":"CGRect"}],"selectorString":"initWithFrame:","instructionType":"obj_selector","objectName":"view"},{"className":"UIColor","selectorString":"redColor","instructionType":"class_selector","selectorReturnValueName":"redColor"},{"selectorParams":[{"type":"object_name","data":"redColor"}],"selectorString":"setBackgroundColor:","instructionType":"obj_selector","objectName":"view"},{"selectorReturnValueName":"selfView","selectorString":"view","instructionType":"obj_selector","objectName":"self"},{"selectorParams":[{"type":"object_name","data":"view"}],"selectorString":"addSubview:","instructionType":"obj_selector","objectName":"selfView"}];
+    window.control.call('callReflection',JSON.stringify(json));
+}
+
+function callJsMethod(method) {//app所有调用JS的方法都会在此分发
+    if(typeof window[method] === 'function'){
+        try {
+            var result;
+            var params = Array.prototype.slice.call(arguments);
+            if (params.length) {
+                params = params.slice(1);
+                result = window[method](params);
+                return result;
+            } else {
+                result = window[method]();
+                return result;
+            }
+        } catch (e) {
+            return -999;
+        }
+    } else {
+        return -999;
+    }
+}
+    </script>
+

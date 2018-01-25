@@ -1,0 +1,360 @@
+//
+//  VKWebDataStorageModule.m
+//  vKan
+//
+//  Created by kinsun on 2017/12/29.
+//  Copyright © 2017年 FengCaiRuiYuan. All rights reserved.
+//
+
+@interface _WDObserverModel : NSObject
+
+@property (nonatomic, weak) id observer;
+-(void)executeWithArg:(id)arg oldArg:(id)oldArg;
+
+@end
+
+@implementation _WDObserverModel -(void)executeWithArg:(id)arg oldArg:(id)oldArg {} @end
+
+@interface _WDClientObserverModel : _WDObserverModel
+
+@property (nonatomic, copy) void (^callback)(NSString *value, NSString *oldValue);
+
+@end
+
+@implementation _WDClientObserverModel
+
+-(void)executeWithArg:(id)arg oldArg:(id)oldArg {
+    if (self.observer && _callback) {
+        _callback(arg, oldArg);
+    }
+}
+
+@end
+
+#import "VKWebView.h"
+
+@interface _WDHtmlObserverModel : _WDObserverModel
+
+@property (nonatomic, copy) NSString *JSMethodName;
+
+@end
+
+@implementation _WDHtmlObserverModel
+
+-(void)executeWithArg:(id)arg oldArg:(id)oldArg {
+    VKWebView *webView = self.observer;
+    if (webView && _JSMethodName) {
+        NSString *js = nil;
+        if (oldArg) {
+            js = [NSString stringWithFormat:@"%@','%@','%@", _JSMethodName, arg, oldArg];
+        } else {
+            js = [NSString stringWithFormat:@"%@','%@", _JSMethodName, arg];
+        }
+        [webView evaluateJavaScriptMethod:js completionHandler:nil];
+    }
+}
+
+@end
+
+#define k_OperationAdditionalArticleIDKey    @"article_id"
+#define k_OperationAdditionalCommentCountKey @"comment_count"
+#define k_OperationAdditionalIncludeKey      @"is_include"
+
+#import "VKWebDataStorageModule.h"
+#import "VKWebViewScriptHandler.h"
+
+@interface VKWebDataStorageModule ()
+
+@property (nonatomic, strong, readonly) NSMutableDictionary <NSString*, NSString*>*dataPool;
+@property (nonatomic, strong, readonly) NSMutableDictionary <NSString*, NSMutableArray<_WDObserverModel*>*>*observerPool;
+@property (nonatomic, strong, readonly) NSDictionary <NSString*,VKWebViewScriptHandler*>*scriptHandlers;
+
+@end
+
+@implementation VKWebDataStorageModule
+@synthesize dataPool = _dataPool, observerPool = _observerPool, scriptHandlers = _scriptHandlers;
+
+static VKWebDataStorageModule *_instance;
++(instancetype)shareInstance {
+    if (_instance == nil) {
+        _instance = [[self alloc]init];
+    }
+    return _instance;
+}
+
++(void)setValue:(NSString*)value forKey:(NSString*)key {
+    VKWebDataStorageModule *storage = [self shareInstance];
+    [storage WD_setValue:value forKey:key];
+}
+
+-(void)WD_setValue:(NSString*)value forKey:(NSString*)key {
+    if (value && key) {
+        @synchronized (self) {
+            NSString *stringValue = value.description;
+            NSMutableDictionary <NSString*, NSString*>*dataPool = self.dataPool;
+            NSString *oldValue = [dataPool objectForKey:key];
+            [dataPool setObject:stringValue forKey:key];
+            
+            NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = self.observerPool;
+            NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:key];
+            NSArray <_WDObserverModel*>*m_array = observerArray.mutableCopy;
+            if (m_array) {
+                for (_WDObserverModel *model in m_array) {
+                    [model executeWithArg:stringValue oldArg:oldValue];
+                }
+            }
+        }
+    }
+}
+
++(NSString*)valueForKey:(NSString*)key {
+    VKWebDataStorageModule *storage = [self shareInstance];
+    return [storage.dataPool objectForKey:key];
+}
+
++(void)addObserverModel:(_WDObserverModel*)model forKeyPath:(NSString*)keyPath {
+    VKWebDataStorageModule *storage = [self shareInstance];
+    @synchronized (storage) {
+        NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+        NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:keyPath];
+        if (observerArray) {
+            for (_WDObserverModel *k_model in observerArray) {
+                if (k_model.observer == model.observer) {
+                    return;
+                }
+            }
+        } else {
+            observerArray = [NSMutableArray array];
+            [observerPool setObject:observerArray forKey:keyPath];
+        }
+        [observerArray addObject:model];
+    }
+}
+
++(void)addObserverWebView:(VKWebView*)webView JSMethodName:(NSString*)JSMethodName forKeyPath:(NSString*)keyPath {
+    _WDHtmlObserverModel *model = [[_WDHtmlObserverModel alloc]init];
+    model.observer = webView;
+    model.JSMethodName = JSMethodName;
+    [self addObserverModel:model forKeyPath:keyPath];
+}
+
++(void)removeObserverWebView:(VKWebView*)webView forKeyPath:(NSString*)keyPath {
+    [self removeObserver:webView forKeyPath:keyPath];
+}
+
++(void)addObserver:(id)observer callback:(void(^)(NSString *value, NSString *oldValue))callback forKeyPath:(NSString*)keyPath {
+    _WDClientObserverModel *model = [[_WDClientObserverModel alloc]init];
+    model.observer = observer;
+    model.callback = callback;
+    [self addObserverModel:model forKeyPath:keyPath];
+}
+
++(void)removeObserver:(id)observer forKeyPath:(NSString*)keyPath {
+    VKWebDataStorageModule *storage = [self shareInstance];
+    @synchronized (storage) {
+        NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+        NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:keyPath];
+        if (observerArray) {
+            for (_WDObserverModel *model in observerArray) {
+                if (model.observer == observer) {
+                    [observerArray removeObject:model];
+                    break;
+                }
+            }
+            if (observerArray.count <= 0) {
+                [observerPool removeObjectForKey:keyPath];
+            }
+        }
+    }
+}
+
++(void)removeObserver:(id)observer {
+    VKWebDataStorageModule *storage = [self shareInstance];
+    @synchronized (storage) {
+        NSMutableDictionary <NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+        NSArray <NSString*>*allKeys = observerPool.allKeys;
+        if (allKeys.count) {
+            for (NSString *key in allKeys) {
+                NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:key];
+                NSMutableArray <_WDObserverModel*>*removeObserverArray = [NSMutableArray array];
+                for (_WDObserverModel *model in observerArray) {
+                    id model_observer = model.observer;
+                    if (model_observer == observer || model_observer == nil) {
+                        [removeObserverArray addObject:model];
+                    }
+                }
+                [observerArray removeObjectsInArray:removeObserverArray];
+                if (observerArray.count <= 0) {
+                    [observerPool removeObjectForKey:key];
+                }
+            }
+        }
+    }
+}
+
++(void)scriptHandlerSetValue:(WKScriptMessage*)message {
+    NSString *body = message.body;
+    if (body.length) {
+        NSDictionary *dict = [body JSONValue];
+        NSString *key = [dict objectForKey:@"key"];
+        NSString *value = [dict objectForKey:@"value"];
+        [self setValue:value forKey:key];
+    }
+}
+
++(NSString*)scriptHandlerGetValue:(WKScriptMessage*)message {
+    NSString *body = message.body;
+    if (body.length) {
+        NSDictionary *dict = [body JSONValue];
+        NSString *key = [dict objectForKey:@"key"];
+        return [self valueForKey:key];
+    }
+    return nil;
+}
+
++(void)scriptHandlerAddObserver:(WKScriptMessage*)message {
+    NSString *body = message.body;
+    if (body.length) {
+        VKWebView *webView = (VKWebView*)message.webView;
+        NSDictionary *dict = [body JSONValue];
+        NSString *keyPath = [dict objectForKey:@"key"];
+        NSString *JSMethodName = [dict objectForKey:@"method_name"];
+        [self addObserverWebView:webView JSMethodName:JSMethodName forKeyPath:keyPath];
+    }
+}
+
++(void)scriptHandlerRemoveObserver:(WKScriptMessage*)message {
+    NSString *body = message.body;
+    if (body.length) {
+        VKWebView *webView = (VKWebView*)message.webView;
+        NSDictionary *dict = [body JSONValue];
+        NSString *keyPath = [dict objectForKey:@"key"];
+        [self removeObserverWebView:webView forKeyPath:keyPath];
+    }
+}
+
++(void)scriptHandlerRemoveCurrentObserver:(WKScriptMessage*)message {
+    VKWebView *webView = (VKWebView*)message.webView;
+    [self removeObserver:webView];
+}
+
++(void)scriptHandlerreinitDataStorage {
+    VKWebDataStorageModule *storage = [self shareInstance];
+    @synchronized (storage) {
+        NSMutableDictionary <NSString *,NSMutableArray<_WDObserverModel *> *> *observerPool = storage.observerPool;
+        if (observerPool && observerPool.allKeys.count) {
+            [observerPool removeAllObjects];
+        }
+        NSMutableDictionary<NSString *,NSString *> *dataPool = storage.dataPool;
+        if (dataPool.allKeys.count) {
+            NSString *key = @"token";
+            NSString *token = [dataPool objectForKey:key];
+            [dataPool removeAllObjects];
+            if (token) {
+                [dataPool setObject:token forKey:key];
+            }
+        }
+    }
+}
+
+-(NSMutableDictionary<NSString *,NSMutableArray<_WDObserverModel *> *> *)observerPool {
+    if (!_observerPool) {
+        _observerPool = [NSMutableDictionary dictionary];
+    }
+    return _observerPool;
+}
+
+-(NSMutableDictionary<NSString *,NSString *> *)dataPool {
+    if (!_dataPool) {
+        _dataPool = [NSMutableDictionary dictionary];
+    }
+    return _dataPool;
+}
+
+-(NSDictionary<NSString *,VKWebViewScriptHandler *> *)scriptHandlers {
+    if (!_scriptHandlers) {
+        Class class = self.class;
+        VKWebViewScriptHandler *setValue = [VKWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerSetValue:)];
+        VKWebViewScriptHandler *getValue = [VKWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerGetValue:)];
+        VKWebViewScriptHandler *addObserver = [VKWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerAddObserver:)];
+        VKWebViewScriptHandler *removeObserver = [VKWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerRemoveObserver:)];
+        VKWebViewScriptHandler *removeCurrentObserver = [VKWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerRemoveCurrentObserver:)];
+        VKWebViewScriptHandler *reInit = [VKWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerreinitDataStorage)];
+        _scriptHandlers = @{@"setValue":setValue, @"getValue":getValue, @"addObserver":addObserver, @"removeObserver":removeObserver, @"removeCurrentObserver":removeCurrentObserver, @"reInit":reInit};
+    }
+    return _scriptHandlers;
+}
+
++(NSDictionary<NSString *,VKWebViewScriptHandler *> *)scriptHandlers {
+    return [VKWebDataStorageModule shareInstance].scriptHandlers;
+}
+
++(void)setOperationAdditionalData:(NSDictionary*)data {
+    if (data) {
+        VKWebDataStorageModule *storage = [self shareInstance];
+        NSArray *list = [data objectForKey:@"list"];
+        for (NSDictionary *dict in list) {
+            NSString *article_id = [dict objectForKey:k_OperationAdditionalArticleIDKey];
+            if (article_id.length) {
+                NSString *comment_count = [dict objectForKey:k_OperationAdditionalCommentCountKey];
+                if (comment_count) {
+                    NSString *key = [self dataStorageKeyFormTitle:k_OperationAdditionalCommentCountKey base_id:article_id];
+                    [storage WD_setValue:comment_count forKey:key];
+                }
+                NSString *is_include = [dict objectForKey:k_OperationAdditionalIncludeKey];
+                if (is_include) {
+                    NSString *key = [self dataStorageKeyFormTitle:k_OperationAdditionalIncludeKey base_id:article_id];
+                    [storage WD_setValue:is_include forKey:key];
+                }
+            }
+        }
+    }
+}
+
++(NSString*)dataStorageKeyFormTitle:(NSString*)title base_id:(NSString*)base_id {
+    return [NSString stringWithFormat:@"%@:%@",title, base_id];
+}
+
++(NSString*)commentCountKeyWithArticleID:(NSString*)articleID {
+    return [self dataStorageKeyFormTitle:k_OperationAdditionalCommentCountKey base_id:articleID];
+}
+
++(void)setCommentCount:(NSString*)commentCount article_id:(NSString*)article_id {
+    if (commentCount && article_id) {
+        NSString *key = [self commentCountKeyWithArticleID:article_id];
+        VKWebDataStorageModule *storage = [self shareInstance];
+        [storage WD_setValue:commentCount forKey:key];
+    }
+}
+
++(NSString*)commentCountForArticle_id:(NSString*)article_id {
+    if (article_id) {
+        NSString *comment_count_key = [VKWebDataStorageModule dataStorageKeyFormTitle:k_OperationAdditionalCommentCountKey base_id:article_id];
+        NSString *comment_count = [VKWebDataStorageModule valueForKey:comment_count_key];
+        return comment_count;
+    }
+    return nil;
+}
+
++(NSString*)includeStatusKeyWithArticleID:(NSString*)articleID {
+    return [self dataStorageKeyFormTitle:k_OperationAdditionalIncludeKey base_id:articleID];
+}
+
++(void)setIncludeStatus:(NSString*)includeStatus article_id:(NSString*)article_id {
+    if (includeStatus && article_id) {
+        NSString *key = [self includeStatusKeyWithArticleID:article_id];
+        VKWebDataStorageModule *storage = [self shareInstance];
+        [storage WD_setValue:includeStatus forKey:key];
+    }
+}
+
++(NSString*)includeStatusForArticle_id:(NSString*)article_id {
+    if (article_id) {
+        NSString *is_include_key = [VKWebDataStorageModule dataStorageKeyFormTitle:k_OperationAdditionalIncludeKey base_id:article_id];
+        NSString *is_include = [VKWebDataStorageModule valueForKey:is_include_key];
+        return is_include;
+    }
+    return nil;
+}
+
+@end

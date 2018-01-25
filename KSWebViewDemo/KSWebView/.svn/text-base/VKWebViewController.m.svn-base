@@ -1,0 +1,125 @@
+//
+//  VKWebViewController.m
+//  vKan
+//
+//  Created by kinsun on 17/2/23.
+//  Copyright © 2017年 FengCaiRuiYuan. All rights reserved.
+//
+
+#import "VKWebViewController.h"
+
+@interface VKWebViewController () <WKNavigationDelegate> {
+    BOOL _isTerminateWebView;
+}
+
+@end
+
+@implementation VKWebViewController
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self applicationWillEnterForeground];
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self.webView evaluateJavaScriptMethod:k_WebViewDidAppear completionHandler:nil];
+}
+
+-(void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    VKWebView *webView = self.webView;
+    [webView pausePlayingVideo];
+    [webView evaluateJavaScriptMethod:k_WebViewDidDisappear completionHandler:nil];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _isTerminateWebView = NO;
+    
+    self.title = @"正在加载...";
+    
+    VKWebView *webView = [VKWebView safelyReleaseWebViewWithFrame:CGRectZero delegate:self];
+    __weak typeof(self) weakSelf = self;
+    [webView setWebViewTitleChangedCallback:^(NSString *title) {
+        if (title.length) {
+            weakSelf.title = title;
+        }
+    }];
+    [self layoutWebView:webView];
+    _webView = webView;
+    
+    VKWebViewScriptHandler *reflection = [VKWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(scriptHandlerReflection:)];
+    VKWebViewScriptHandler *operation = [VKWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(scriptHandlerOperation:)];
+    webView.scriptHandlers = @{k_CallReflection:reflection, k_CallOperation:operation};
+    [VKNotificationCenter addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
+}
+
+-(void)layoutWebView:(VKWebView *)webView{
+    UIView *view = self.view;
+    k_creatFrameElement;
+    viewY=self.navigationView.height,viewW=view.width,viewH=view.height-viewY;
+    k_settingFrame(webView);
+    [view addSubview:webView];
+}
+
+-(void)loadWebView{
+    if (_url.length) {
+        [_webView loadWebViewWithURL:_url params:_params];
+    } else if (_filePath.length) {
+        [_webView loadWebViewWithFilePath:_filePath];
+    }
+}
+
+-(void)scriptHandlerReflection:(WKScriptMessage*)message {
+    NSString *body = message.body;
+    [VKWebViewReflectiveService webViewReflectiveServiceWithSelf:self body:body];
+}
+
+-(void)scriptHandlerOperation:(WKScriptMessage*)message {
+    [VKWebViewOperationCenter webViewOperationWithController:self message:message];
+}
+
+#pragma mark - WKNavigationDelegate
+
+- (void)webView:(VKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation{
+    
+}
+
+- (void)webView:(VKWebView *)webView didCommitNavigation:(WKNavigation *)navigation{
+    
+}
+
+- (void)webView:(VKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+
+}
+
+- (void)webView:(VKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error{
+    NSLog(@"error=%@",error.localizedDescription);
+    [webView resetProgressView];
+}
+
+- (void)webView:(VKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+- (void)webView:(VKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
+    decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
+- (void)webViewWebContentProcessDidTerminate:(VKWebView *)webView{
+    _isTerminateWebView = YES;
+}
+
+-(void)applicationWillEnterForeground{
+    if (_isTerminateWebView) {
+        _isTerminateWebView = NO;
+        [self loadWebView];
+    }
+}
+
+-(void)dealloc {
+    [VKNotificationCenter removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+}
+
+@end

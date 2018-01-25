@@ -1,0 +1,35 @@
+//
+//  VKWebViewScriptHandler.m
+//  vKan
+//
+//  Created by kinsun on 17/9/20.
+//  Copyright © 2017年 FengCaiRuiYuan. All rights reserved.
+//
+
+#import "VKWebViewScriptHandler.h"
+
+@implementation VKWebViewScriptHandler {
+    SEL _action;
+}
+
+-(void)setAction:(SEL)action {
+    _action = action;
+}
+
+-(SEL)action {
+    return _action;
+}
+
+-(instancetype)initWithTarget:(id)target action:(SEL)action {
+    if (self = [super init]) {
+        _target = target;
+        _action = action;
+    }
+    return self;
+}
+
++(VKWebViewScriptHandler*)scriptHandlerWithTarget:(id)target action:(SEL)action {
+    return [[self alloc]initWithTarget:target action:action];
+}
+
+@end
