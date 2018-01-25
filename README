@@ -1,1 +1,0 @@
-KSWebView是基于WKWebview进行2次封装的WebView,具有无缝JS与原生交互,无缝JS与原生数据交互,给公用数据添加原生以及JS监听者回调,H5控制原生指针等功能

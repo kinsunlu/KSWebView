@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D20D6DA2016CBBA00E2CE56 /* test.html in Resources */ = {isa = PBXBuildFile; fileRef = 6D20D6D92016CBBA00E2CE56 /* test.html */; };
+		6DA040AD2019C73C003DB6A3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6DA040AC2019C73C003DB6A3 /* README.md */; };
 		6DE43EA22015EAB6006F6457 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EA12015EAB6006F6457 /* AppDelegate.m */; };
 		6DE43EAA2015EAB6006F6457 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DE43EA92015EAB6006F6457 /* Assets.xcassets */; };
 		6DE43EB02015EAB6006F6457 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EAF2015EAB6006F6457 /* main.m */; };
@@ -45,6 +46,7 @@
 
 /* Begin PBXFileReference section */
 		6D20D6D92016CBBA00E2CE56 /* test.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = test.html; sourceTree = "<group>"; };
+		6DA040AC2019C73C003DB6A3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6DE43E9D2015EAB6006F6457 /* KSWebViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KSWebViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DE43EA02015EAB6006F6457 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6DE43EA12015EAB6006F6457 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 		6DE43E942015EAB6006F6457 = {
 			isa = PBXGroup;
 			children = (
+				6DA040AC2019C73C003DB6A3 /* README.md */,
 				6DE43E9F2015EAB6006F6457 /* KSWebViewDemo */,
 				6DE43E9E2015EAB6006F6457 /* Products */,
 			);
@@ -317,6 +320,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DA040AD2019C73C003DB6A3 /* README.md in Resources */,
 				6D20D6DA2016CBBA00E2CE56 /* test.html in Resources */,
 				6DE43EAA2015EAB6006F6457 /* Assets.xcassets in Resources */,
 			);
