@@ -12,7 +12,7 @@
 @property (nonatomic, weak, readonly) id target;
 @property (nonatomic, readonly) SEL action;
 
-+(KSWebViewScriptHandler*)scriptHandlerWithTarget:(id)target action:(SEL)action;
++(instancetype)scriptHandlerWithTarget:(id)target action:(SEL)action;
 -(instancetype)initWithTarget:(id)target action:(SEL)action;
 
 @end

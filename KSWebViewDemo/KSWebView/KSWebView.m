@@ -85,7 +85,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     return self;
 }
 
--(void)layoutSubviews{
+-(void)layoutSubviews {
     [super layoutSubviews];
     CGFloat windowWidth = self.frame.size.width;
     k_creatFrameElement;
@@ -95,7 +95,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     k_settingFrame(_progressView);
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (object == self) {
         if ([keyPath isEqualToString:k_EstimatedProgress]) {
             NSString *url = self.URL.absoluteString;
@@ -160,7 +160,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
             NSMethodSignature *signature = [target methodSignatureForSelector:action];
             const char *returnType = signature.methodReturnType;
             BOOL notHasReturnValue = !strcmp(returnType, @encode(void));
-            if (notHasReturnValue) completionHandler(@"1");
+            if (notHasReturnValue) completionHandler(nil);
             if ([target respondsToSelector:action]) {
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
                 if (signature.numberOfArguments > 2) {
@@ -180,7 +180,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
             }
             if (notHasReturnValue) return;
         } else {
-            returnValue = @"0";
+            returnValue = @"-999";
         }
         completionHandler(returnValue);
     } else if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {

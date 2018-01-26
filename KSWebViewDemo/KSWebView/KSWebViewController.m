@@ -23,12 +23,12 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.webView evaluateJavaScriptMethod:k_WebViewDidAppear completionHandler:nil];
+    [_webView evaluateJavaScriptMethod:k_WebViewDidAppear completionHandler:nil];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    KSWebView *webView = self.webView;
+    KSWebView *webView = _webView;
     [webView pausePlayingVideo];
     [webView evaluateJavaScriptMethod:k_WebViewDidDisappear completionHandler:nil];
 }

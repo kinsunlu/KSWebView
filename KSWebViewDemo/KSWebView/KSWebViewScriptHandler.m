@@ -11,10 +11,6 @@
     SEL _action;
 }
 
--(void)setAction:(SEL)action {
-    _action = action;
-}
-
 -(SEL)action {
     return _action;
 }
@@ -27,7 +23,7 @@
     return self;
 }
 
-+(KSWebViewScriptHandler*)scriptHandlerWithTarget:(id)target action:(SEL)action {
++(instancetype)scriptHandlerWithTarget:(id)target action:(SEL)action {
     return [[self alloc]initWithTarget:target action:action];
 }
 
