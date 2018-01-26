@@ -245,11 +245,9 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     if (url.length) {
         NSMutableString *urlString = [NSMutableString stringWithString:url];
         if (params) {
-            NSString *bridge = nil;
-            if ([urlString rangeOfString:@"?"].location != NSNotFound) {
+            NSString *bridge = @"?";
+            if ([urlString rangeOfString:bridge].location != NSNotFound) {
                 bridge = @"&";
-            } else {
-                bridge = @"?";
             }
             NSMutableString *paramsStr = [NSMutableString stringWithString:bridge];
             NSArray *allKeys = params.allKeys;
