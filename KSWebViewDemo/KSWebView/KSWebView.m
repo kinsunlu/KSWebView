@@ -201,7 +201,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
                     completionHandler(obj, error);
                 } else {
                     if (!error) {
-                        error = [NSError errorWithDomain:@"VKJavaScriptErrorDomain" code:-999 userInfo:@{NSLocalizedDescriptionKey:@"没有找到JavaScript方法",
+                        error = [NSError errorWithDomain:@"KSJavaScriptErrorDomain" code:-999 userInfo:@{NSLocalizedDescriptionKey:@"没有找到JavaScript方法",
                                                                                                        NSLocalizedFailureReasonErrorKey:@"HTML中不包含此方法"}];
                     }
                     completionHandler(nil, error);
