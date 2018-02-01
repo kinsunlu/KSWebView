@@ -16,5 +16,8 @@
 @interface KSWebViewMemoryManager : NSObject
 
 +(void)addWebView:(KSWebView*)webView;
+//如果需要，此方法设置在AppDelegate的-applicationDidReceiveMemoryWarning: 回调中
+//可以在内存警告时迅速释放所有没有引用的webView
++(void)releaseAllWebView;
 
 @end

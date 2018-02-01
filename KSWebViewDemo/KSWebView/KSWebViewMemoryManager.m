@@ -62,7 +62,7 @@ static KSWebViewMemoryManager *_instance;
     if (!_timer) {
         NSTimer *timer = [NSTimer timerWithTimeInterval:60.f target:self selector:@selector(checkReleaseInWebViewPool) userInfo:nil repeats:YES];
         NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
-        [runLoop addTimer:timer forMode:NSRunLoopCommonModes];
+        [runLoop addTimer:timer forMode:NSDefaultRunLoopMode];
         _timer = timer;
     }
 }
@@ -75,29 +75,36 @@ static KSWebViewMemoryManager *_instance;
 }
 
 -(void)checkReleaseInWebViewPool {
-    dispatch_async(KSWebViewMemoryManager.queue, ^{
-        NSMutableArray <_KSWebViewMemoryManagerItem*>*webViewPool = self.webViewPool;
-        NSLog(@"正在检查webViewPool,现有%zd个对象在池中",webViewPool.count);
-        NSMutableArray <_KSWebViewMemoryManagerItem*>*releasePool = [NSMutableArray array];
-        NSTimeInterval nowTime = [NSDate date].timeIntervalSince1970;
-        for (_KSWebViewMemoryManagerItem *item in webViewPool.mutableCopy) {
-            NSTimeInterval itemTime = item.timeInterval;
-            if (nowTime - itemTime > 10.f) {
-                KSWebView *webView = item.webView;//模型内一个引用,现在这个指针一个引用所以是2
-                NSUInteger count = [[webView valueForKey:@"retainCount"] unsignedIntegerValue];
-                if (count <= 2 && !webView.isLoading) {
-                    [releasePool addObject:item];
+    @synchronized (self) {
+        dispatch_async(KSWebViewMemoryManager.queue, ^{
+            NSMutableArray <_KSWebViewMemoryManagerItem*>*webViewPool = self.webViewPool;
+            NSLog(@"正在检查webViewPool,现有%zd个对象在池中",webViewPool.count);
+            NSMutableArray <_KSWebViewMemoryManagerItem*>*releasePool = [NSMutableArray array];
+            NSTimeInterval nowTime = [NSDate date].timeIntervalSince1970;
+            for (_KSWebViewMemoryManagerItem *item in webViewPool.mutableCopy) {
+                NSTimeInterval itemTime = item.timeInterval;
+                if (nowTime - itemTime > 10.f) {
+                    KSWebView *webView = item.webView;//模型内一个引用,现在这个指针一个引用所以是2
+                    NSUInteger count = [[webView valueForKey:@"retainCount"] unsignedIntegerValue];
+                    if (count <= 2 && !webView.isLoading) {
+                        [releasePool addObject:item];
+                    }
                 }
             }
-        }
-        if (releasePool.count) {
-            NSLog(@"检查有%zd个webView没有引用正在释放...",releasePool.count);
-            [webViewPool removeObjectsInArray:releasePool];
-        }
-        if (!webViewPool.count) {
-            [self stopChecking];
-        }
-    });
+            if (releasePool.count) {
+                NSLog(@"检查有%zd个webView没有引用正在释放...",releasePool.count);
+                [webViewPool removeObjectsInArray:releasePool];
+            }
+            if (!webViewPool.count) {
+                [self stopChecking];
+            }
+        });
+    }
+}
+
++(void)releaseAllWebView {
+    KSWebViewMemoryManager *mgr = [self shareInstance];
+    [mgr checkReleaseInWebViewPool];
 }
 
 -(NSMutableArray<_KSWebViewMemoryManagerItem *> *)webViewPool {

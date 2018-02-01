@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "KSMainViewController.h"
+#import "KSWebViewMemoryManager.h"
 
 @interface AppDelegate ()
 
@@ -26,6 +27,10 @@
     return YES;
 }
 
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {
+    //此方法可以在内存警告时迅速释放所有没有引用的webView
+    [KSWebViewMemoryManager releaseAllWebView];
+}
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
