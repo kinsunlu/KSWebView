@@ -86,7 +86,7 @@ static KSWebViewMemoryManager *_instance;
                 if (nowTime - itemTime > 10.f) {
                     KSWebView *webView = item.webView;//模型内一个引用,现在这个指针一个引用所以是2
                     NSUInteger count = [[webView valueForKey:@"retainCount"] unsignedIntegerValue];
-                    if (count <= 2 && !webView.isLoading) {
+                    if (count <= 2) {
                         [releasePool addObject:item];
                     }
                 }
