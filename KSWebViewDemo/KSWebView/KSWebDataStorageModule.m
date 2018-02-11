@@ -196,7 +196,7 @@ static KSWebDataStorageModule *_instance;
 +(void)scriptHandlerSetValue:(WKScriptMessage*)message {
     NSString *body = message.body;
     if (body.length) {
-        NSDictionary *dict = [body JSONValue];
+        NSDictionary *dict = [body mj_JSONObject];
         NSString *key = [dict objectForKey:@"key"];
         NSString *value = [dict objectForKey:@"value"];
         [self setValue:value forKey:key];
@@ -206,7 +206,7 @@ static KSWebDataStorageModule *_instance;
 +(NSString*)scriptHandlerGetValue:(WKScriptMessage*)message {
     NSString *body = message.body;
     if (body.length) {
-        NSDictionary *dict = [body JSONValue];
+        NSDictionary *dict = [body mj_JSONObject];
         NSString *key = [dict objectForKey:@"key"];
         return [self valueForKey:key];
     }
@@ -217,7 +217,7 @@ static KSWebDataStorageModule *_instance;
     NSString *body = message.body;
     if (body.length) {
         KSWebView *webView = (KSWebView*)message.webView;
-        NSDictionary *dict = [body JSONValue];
+        NSDictionary *dict = [body mj_JSONObject];
         NSString *keyPath = [dict objectForKey:@"key"];
         NSString *JSMethodName = [dict objectForKey:@"method_name"];
         [self addObserverWebView:webView JSMethodName:JSMethodName forKeyPath:keyPath];
@@ -228,7 +228,7 @@ static KSWebDataStorageModule *_instance;
     NSString *body = message.body;
     if (body.length) {
         KSWebView *webView = (KSWebView*)message.webView;
-        NSDictionary *dict = [body JSONValue];
+        NSDictionary *dict = [body mj_JSONObject];
         NSString *keyPath = [dict objectForKey:@"key"];
         [self removeObserverWebView:webView forKeyPath:keyPath];
     }

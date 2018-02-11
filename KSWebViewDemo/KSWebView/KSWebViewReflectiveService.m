@@ -67,7 +67,7 @@
         NSString *modelClass = _modelClass;
         if (modelJson.length && modelClass.length) {
             Class class = NSClassFromString(modelClass);
-            NSDictionary *dict = [modelJson JSONValue];
+            NSDictionary *dict = [modelJson mj_JSONObject];
             _model = [class objectWithKeyValues:dict];
         }
     }
@@ -133,7 +133,7 @@
 @implementation KSWebViewReflectiveService
 
 +(void)webViewReflectiveServiceWithSelf:(id)selfObj body:(NSString*)body {
-    NSArray <NSDictionary*>*dict = [body JSONValue];
+    NSArray <NSDictionary*>*dict = [body mj_JSONObject];
     NSArray <KSWebViewReflectiveServiceModel*>*codes = [KSWebViewReflectiveServiceModel objectArrayWithKeyValuesArray:dict];
     
     KSReflectiveServiceObject *r_selfObj = [KSReflectiveServiceObject reflectiveServiceObjectValue:selfObj];

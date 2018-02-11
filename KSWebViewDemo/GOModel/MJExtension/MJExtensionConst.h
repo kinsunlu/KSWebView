@@ -5,12 +5,12 @@
 #import <Foundation/Foundation.h>
 
 // 过期
-#define MJExtensionDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
+//#define MJExtensionDeprecated(instead) NS_DEPRECATED(2_0, 2_0, 2_0, 2_0, instead)
 
 // 构建错误
 #define MJExtensionBuildError(clazz, msg) \
 NSError *error = [NSError errorWithDomain:msg code:250 userInfo:nil]; \
-[clazz setError:error];
+[clazz setMj_error:error];
 
 // 日志输出
 #ifdef DEBUG
@@ -25,7 +25,7 @@ NSError *error = [NSError errorWithDomain:msg code:250 userInfo:nil]; \
  * @param returnValue 返回值
  */
 #define MJExtensionAssertError(condition, returnValue, clazz, msg) \
-[clazz setError:nil]; \
+[clazz setMj_error:nil]; \
 if ((condition) == NO) { \
     MJExtensionBuildError(clazz, msg); \
     return returnValue;\
@@ -60,7 +60,7 @@ MJExtensionAssert2((param) != nil, returnValue)
 #define MJLogAllIvars \
 -(NSString *)description \
 { \
-    return [self keyValues].description; \
+    return [self mj_keyValues].description; \
 }
 #define MJExtensionLogAllProperties MJLogAllIvars
 

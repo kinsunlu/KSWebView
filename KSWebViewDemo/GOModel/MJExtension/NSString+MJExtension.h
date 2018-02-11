@@ -13,21 +13,21 @@
 /**
  *  驼峰转下划线（loveYou -> love_you）
  */
-- (NSString *)underlineFromCamel;
+- (NSString *)mj_underlineFromCamel;
 /**
  *  下划线转驼峰（love_you -> loveYou）
  */
-- (NSString *)camelFromUnderline;
+- (NSString *)mj_camelFromUnderline;
 /**
  * 首字母变大写
  */
-- (NSString *)firstCharUpper;
+- (NSString *)mj_firstCharUpper;
 /**
  * 首字母变小写
  */
-- (NSString *)firstCharLower;
+- (NSString *)mj_firstCharLower;
 
-- (BOOL)isPureInt;
+- (BOOL)mj_isPureInt;
 
-- (NSURL *)url;
+- (NSURL *)mj_url;
 @end
