@@ -148,48 +148,18 @@ function callJsMethod(method) {//app所有调用JS的方法都会在此分发
 function importClass(className) {
 	//先导入要用到的OC类
 	var tools = window.OCTools;
-	var UIViewController = tools.importClass("UIViewController");
-	var UIColor = tools.importClass("UIColor");
+	var KSJSTestController = tools.importClass("KSJSTestController");
 	var UIApplication = tools.importClass("UIApplication");
+	var UIAlertView = tools.importClass("UIAlertView");
 	
-	var vc = UIViewController.alloc().init();
-	vc.setTitle("测试标题");
-	
-	var white = UIColor.whiteColor();
-	vc.view().setBackgroundColor(white);
-			
-	vc.view().setTag(17287);
+	var vc = KSJSTestController.alloc().init();
+	vc.setUrl("https://github.com/kinsunlu/KSWebView/blob/master/README.md");
 	
 	var nav = UIApplication.sharedApplication().keyWindow().rootViewController();
 	nav.pushViewControlleranimated(vc, true);			
-			
-	var UIAlertView = window.OCTools.importClass("UIAlertView");
-	var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","描述信息",null,"关闭",null);
-//	alert.setTag(15269);
-//	alert.setTitle("新标题");
-//	var tag = alert.tag();//返回的number是可以直接使用的
-//	var title = alert.title();//返回的string是可以直接使用的
-	alert.show();
 	
-//	var data = {
-//		'key': 'value',
-//		'anyKey': 'anyValue'
-//	};
-//	//将JS对象转换为NSDictionary
-//	var NSDictionary = window.OCTools.importClass("NSDictionary");
-//	var dict = NSDictionary.dictionaryWithDictionary(data);
-//	//将NSDictionary转换为JS对象
-//	var jsonString = dict.mj_JSONString();
-//	var jsObject = JSON.parse(jsonString);
-
-//var data = ["NO.1", "NO.2", "NO.3", "NO.4"];
-////将JS对象转换为NSDictionary
-//var NSArray = window.OCTools.importClass("NSArray");
-//var arr = NSArray.arrayWithArray(data);
-////将NSDictionary转换为JS对象
-//var jsonString = arr.mj_JSONString();
-//var jsArray = JSON.parse(jsonString);
-	
+	var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","该页面调用代码没有任何一句OC语句完全由JS实现",null,"关闭",null);
+	alert.show();	
 	window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 }
     </script>

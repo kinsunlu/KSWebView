@@ -31,6 +31,7 @@
 		6DE43ECB2015EBCA006F6457 /* KSWebDataStorageModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EC22015EBCA006F6457 /* KSWebDataStorageModule.m */; };
 		6DE43ECC2015EBCA006F6457 /* KSWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EC52015EBCA006F6457 /* KSWebViewController.m */; };
 		6DE43F442015FF90006F6457 /* KSMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43F432015FF90006F6457 /* KSMainViewController.m */; };
+		6DE4EE1F21368E150072CE02 /* KSJSTestController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE4EE1E21368E150072CE02 /* KSJSTestController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +82,7 @@
 		6DE43ECD2015EDA5006F6457 /* KSConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSConstants.h; sourceTree = "<group>"; };
 		6DE43F422015FF90006F6457 /* KSMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSMainViewController.h; sourceTree = "<group>"; };
 		6DE43F432015FF90006F6457 /* KSMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSMainViewController.m; sourceTree = "<group>"; };
+		6DE4EE1E21368E150072CE02 /* KSJSTestController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSJSTestController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +170,7 @@
 				6DE43EA92015EAB6006F6457 /* Assets.xcassets */,
 				6DE43EAE2015EAB6006F6457 /* Info.plist */,
 				6DE43EAF2015EAB6006F6457 /* main.m */,
+				6DE4EE1E21368E150072CE02 /* KSJSTestController.m */,
 				6DE43F422015FF90006F6457 /* KSMainViewController.h */,
 				6DE43F432015FF90006F6457 /* KSMainViewController.m */,
 			);
@@ -267,6 +270,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DE4EE1F21368E150072CE02 /* KSJSTestController.m in Sources */,
 				6D364E60202FF1C30096EB55 /* MJFoundation.m in Sources */,
 				6DE43EB02015EAB6006F6457 /* main.m in Sources */,
 				6D364E5B202FF1C30096EB55 /* MJExtensionConst.m in Sources */,
