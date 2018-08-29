@@ -1,5 +1,7 @@
 # 欢迎使用 KSWebView
 
+如有问题欢迎加入QQ群：700276016
+
 ------
 
 **KSWebView**是基于**WKWebview**进行2次封装的WebView。 KSWebView具有：
