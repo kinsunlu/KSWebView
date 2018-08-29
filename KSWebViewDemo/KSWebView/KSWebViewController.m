@@ -49,8 +49,6 @@
     [self layoutWebView:webView];
     _webView = webView;
     
-    KSWebViewScriptHandler *reflection = [KSWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(scriptHandlerReflection:)];
-    webView.scriptHandlers = @{k_CallReflection:reflection};
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
@@ -68,18 +66,13 @@
     }
 }
 
--(void)scriptHandlerReflection:(WKScriptMessage*)message {
-    NSString *body = message.body;
-    [KSWebViewReflectiveService webViewReflectiveServiceWithSelf:self body:body];
-}
-
 #pragma mark - WKNavigationDelegate
 
-- (void)webView:(KSWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation{
+- (void)webView:(KSWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
     
 }
 
-- (void)webView:(KSWebView *)webView didCommitNavigation:(WKNavigation *)navigation{
+- (void)webView:(KSWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
     
 }
 

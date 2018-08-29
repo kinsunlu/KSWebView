@@ -53,7 +53,7 @@ static KSWebViewMemoryManager *_instance;
         NSTimeInterval nowTime = [NSDate date].timeIntervalSince1970;
         _KSWebViewMemoryManagerItem *item = [_KSWebViewMemoryManagerItem itemWithTimeInterval:nowTime webView:webView];
         [mgr.webViewPool addObject:item];
-        NSLog(@"webViewPool中已有%zd个对象",mgr.webViewPool.count);
+        NSLog(@"webViewPool中已有%td个对象",mgr.webViewPool.count);
         [mgr startChecking];
     }
 }
@@ -78,7 +78,7 @@ static KSWebViewMemoryManager *_instance;
     @synchronized (self) {
         dispatch_async(KSWebViewMemoryManager.queue, ^{
             NSMutableArray <_KSWebViewMemoryManagerItem*>*webViewPool = self.webViewPool;
-            NSLog(@"正在检查webViewPool,现有%zd个对象在池中",webViewPool.count);
+            NSLog(@"正在检查webViewPool,现有%td个对象在池中",webViewPool.count);
             NSMutableArray <_KSWebViewMemoryManagerItem*>*releasePool = [NSMutableArray array];
             NSTimeInterval nowTime = [NSDate date].timeIntervalSince1970;
             for (_KSWebViewMemoryManagerItem *item in webViewPool.mutableCopy) {
@@ -92,7 +92,7 @@ static KSWebViewMemoryManager *_instance;
                 }
             }
             if (releasePool.count) {
-                NSLog(@"检查有%zd个webView没有引用正在释放...",releasePool.count);
+                NSLog(@"检查有%td个webView没有引用正在释放...",releasePool.count);
                 [webViewPool removeObjectsInArray:releasePool];
             }
             if (!webViewPool.count) {

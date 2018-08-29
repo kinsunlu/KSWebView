@@ -43,7 +43,7 @@
         <button onclick="removeObserver(this)">移除对token的监听</button>
         <button onclick="removeCurrentObserver(this)">移除对当前所有的监听</button>
         <button onclick="reInit(this)">初始化数据储存模块中的数据但不移除监听(慎用)</button>
-        <button onclick="testReflection(this)">测试H5反射原生</button>
+        <button onclick="importClass(this)">测试JS映射OC对象(调用)</button>
     </body>
 </html>
 <script>
@@ -119,10 +119,10 @@ function viewDidDisappearOnApp(params) {//无需注册,当前页面消失时调�
     document.getElementById("label2").innerText = '当前网页已经不在App屏幕中了';
 }
 
-function testReflection(params) {//反射调用示例
-    var json = [{"className":"UIView","selectorString":"alloc","instructionType":"class_selector","selectorReturnValueName":"view"},{"selectorParams":[{"type":"basic_data","data":"{{200,200},{200,200}}","basicDataType":"CGRect"}],"selectorString":"initWithFrame:","instructionType":"obj_selector","objectName":"view"},{"className":"UIColor","selectorString":"redColor","instructionType":"class_selector","selectorReturnValueName":"redColor"},{"selectorParams":[{"type":"object_name","data":"redColor"}],"selectorString":"setBackgroundColor:","instructionType":"obj_selector","objectName":"view"},{"selectorReturnValueName":"selfView","selectorString":"view","instructionType":"obj_selector","objectName":"self"},{"selectorParams":[{"type":"object_name","data":"view"}],"selectorString":"addSubview:","instructionType":"obj_selector","objectName":"selfView"}];
-    window.control.call('callReflection',JSON.stringify(json));
-}
+//function testReflection(params) {//反射调用示例
+//  var json = [{"className":"UIView","selectorString":"alloc","instructionType":"class_selector","selectorReturnValueName":"view"},{"selectorParams":[{"type":"basic_data","data":"{{200,200},{200,200}}","basicDataType":"CGRect"}],"selectorString":"initWithFrame:","instructionType":"obj_selector","objectName":"view"},{"className":"UIColor","selectorString":"redColor","instructionType":"class_selector","selectorReturnValueName":"redColor"},{"selectorParams":[{"type":"object_name","data":"redColor"}],"selectorString":"setBackgroundColor:","instructionType":"obj_selector","objectName":"view"},{"selectorReturnValueName":"selfView","selectorString":"view","instructionType":"obj_selector","objectName":"self"},{"selectorParams":[{"type":"object_name","data":"view"}],"selectorString":"addSubview:","instructionType":"obj_selector","objectName":"selfView"}];
+//  window.control.call('callReflection',JSON.stringify(json));
+//}
 
 function callJsMethod(method) {//app所有调用JS的方法都会在此分发
     if(typeof window[method] === 'function'){
@@ -143,6 +143,54 @@ function callJsMethod(method) {//app所有调用JS的方法都会在此分发
     } else {
         return -999;
     }
+}
+
+function importClass(className) {
+	//先导入要用到的OC类
+	var tools = window.OCTools;
+	var UIViewController = tools.importClass("UIViewController");
+	var UIColor = tools.importClass("UIColor");
+	var UIApplication = tools.importClass("UIApplication");
+	
+	var vc = UIViewController.alloc().init();
+	vc.setTitle("测试标题");
+	
+	var white = UIColor.whiteColor();
+	vc.view().setBackgroundColor(white);
+			
+	vc.view().setTag(17287);
+	
+	var nav = UIApplication.sharedApplication().keyWindow().rootViewController();
+	nav.pushViewControlleranimated(vc, true);			
+			
+	var UIAlertView = window.OCTools.importClass("UIAlertView");
+	var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","描述信息",null,"关闭",null);
+//	alert.setTag(15269);
+//	alert.setTitle("新标题");
+//	var tag = alert.tag();//返回的number是可以直接使用的
+//	var title = alert.title();//返回的string是可以直接使用的
+	alert.show();
+	
+//	var data = {
+//		'key': 'value',
+//		'anyKey': 'anyValue'
+//	};
+//	//将JS对象转换为NSDictionary
+//	var NSDictionary = window.OCTools.importClass("NSDictionary");
+//	var dict = NSDictionary.dictionaryWithDictionary(data);
+//	//将NSDictionary转换为JS对象
+//	var jsonString = dict.mj_JSONString();
+//	var jsObject = JSON.parse(jsonString);
+
+//var data = ["NO.1", "NO.2", "NO.3", "NO.4"];
+////将JS对象转换为NSDictionary
+//var NSArray = window.OCTools.importClass("NSArray");
+//var arr = NSArray.arrayWithArray(data);
+////将NSDictionary转换为JS对象
+//var jsonString = arr.mj_JSONString();
+//var jsArray = JSON.parse(jsonString);
+	
+	window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 }
     </script>
 

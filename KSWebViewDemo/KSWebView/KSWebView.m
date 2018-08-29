@@ -22,6 +22,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
 
 #import "KSWebDataStorageModule.h"
 #import "KSWebViewMemoryManager.h"
+#import "KSOCObjectTools.h"
 #import "KSConstants.h"
 
 @interface KSWebView () <WKUIDelegate> {
@@ -49,6 +50,10 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     NSString *initCss = [NSString stringWithFormat:k_INIT_SCRIPT, k_WebViewBridgeIndexKey];
     WKUserScript *initScript = [[WKUserScript alloc] initWithSource:initCss injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
     [userContentController addUserScript:initScript];
+    
+    NSString *oc_object_tools = KSOCObjectTools.initJavaScriptString;
+    WKUserScript *toolsScript = [[WKUserScript alloc] initWithSource:oc_object_tools injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
+    [userContentController addUserScript:toolsScript];
     
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     configuration.allowsInlineMediaPlayback = NO;
@@ -80,7 +85,9 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
         [self addObserver:self forKeyPath:k_EstimatedProgress options:options context:NULL];
         [self addObserver:self forKeyPath:k_WebViewTitle options:options context:NULL];
         
-        self.scriptHandlers = KSWebDataStorageModule.scriptHandlers;
+        NSMutableDictionary *scriptHandlers = [NSMutableDictionary dictionaryWithDictionary:KSOCObjectTools.scriptHandlers];
+        [scriptHandlers addEntriesFromDictionary:KSWebDataStorageModule.scriptHandlers];
+        self.scriptHandlers = scriptHandlers;
     }
     return self;
 }
@@ -390,7 +397,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSUInteger count) {
             if (index < count) {
-                NSString * durationString = [NSString stringWithFormat:@"%@[%zd].duration.toFixed(1)",k_GetVideoTag,index];
+                NSString * durationString = [NSString stringWithFormat:@"%@[%td].duration.toFixed(1)",k_GetVideoTag,index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
                     if (callback) callback(result.doubleValue);
                 }];
@@ -404,7 +411,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSUInteger count) {
             if (index < count) {
-                NSString * durationString = [NSString stringWithFormat:@"%@[%zd].currentTime.toFixed(1)",k_GetVideoTag,index];
+                NSString * durationString = [NSString stringWithFormat:@"%@[%td].currentTime.toFixed(1)",k_GetVideoTag,index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
                     if (callback) callback(result.doubleValue);
                 }];
@@ -417,7 +424,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     __weak typeof(self) weakSelf = self;
     [self videoPlayerCount:^(NSUInteger count) {
         if (index < count) {
-            NSString *playString = [NSString stringWithFormat:@"%@[%zd].play()",k_GetVideoTag,index];
+            NSString *playString = [NSString stringWithFormat:@"%@[%td].play()",k_GetVideoTag,index];
             [weakSelf evaluateJavaScript:playString completionHandler:nil];
         }
     }];

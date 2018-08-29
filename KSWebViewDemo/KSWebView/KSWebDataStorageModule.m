@@ -57,12 +57,9 @@
 
 @end
 
-#define k_OperationAdditionalArticleIDKey    @"article_id"
-#define k_OperationAdditionalCommentCountKey @"comment_count"
-#define k_OperationAdditionalIncludeKey      @"is_include"
-
 #import "KSWebDataStorageModule.h"
 #import "KSWebViewScriptHandler.h"
+#import "MJExtension.h"
 
 @interface KSWebDataStorageModule ()
 
