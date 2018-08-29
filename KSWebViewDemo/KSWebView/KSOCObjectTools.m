@@ -85,6 +85,28 @@
 
 @implementation _KSOCInvokeModel @end
 
+static NSString *k_colon            = @":";
+static NSString *k_empty            = @"";
+static NSString *k_location_format  = @"%p";
+static NSString *k_class            = @"class";
+static NSString *k_instance         = @"instance";
+static NSString *k_objKey           = @"objKey";
+static NSString *k_className        = @"className";
+static NSString *k_value            = @"value";
+static NSString *k_type             = @"type";
+static NSString *k_other            = @"other";
+static NSString *k_object           = @"object";
+static NSString *k_string           = @"string";
+static NSString *k_bool             = @"bool";
+static NSString *k_float            = @"float";
+static NSString *k_double           = @"double";
+static NSString *k_int              = @"int";
+static NSString *k_uint             = @"uint";
+static NSString *k_long             = @"long";
+static NSString *k_ulong            = @"ulong";
+static NSString *k_longlong         = @"longlong";
+static NSString *k_ulonglong        = @"ulonglong";
+
 #import <WebKit/WKScriptMessage.h>
 #import "KSWebViewScriptHandler.h"
 #import "MJExtension.h"
@@ -121,9 +143,6 @@ static KSOCObjectTools *_instance = nil;
     return _objectPool;
 }
 
-static NSString *k_colon = @":";
-static NSString *k_empty = @"";
-
 +(NSString*)scriptHandlerImportClass:(WKScriptMessage*)message {
     NSString *body = message.body;
     if (body.length) {
@@ -143,7 +162,7 @@ static NSString *k_empty = @"";
                 [instanceMethodNameArray addObjectsFromArray:info.instanceMethod.allKeys];
                 class = [class superclass];
             }
-            NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:classMethodNameArray, @"class", instanceMethodNameArray, @"instance", nil];
+            NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:classMethodNameArray, k_class, instanceMethodNameArray, k_instance, nil];
             NSString *json = [dict mj_JSONString];
             return json;
         }
@@ -213,7 +232,7 @@ static NSString *k_empty = @"";
                     param = nil;
                 } else if ([param isKindOfClass:NSDictionary.class]) {
                     NSDictionary *dict = param;
-                    NSString *objKey = [dict objectForKey:@"objKey"];
+                    NSString *objKey = [dict objectForKey:k_objKey];
                     if (objKey != nil) {
                         _KSOCObject *obj = [objectPool objectForKey:objKey];
                         if (obj.isObject) {
@@ -266,12 +285,12 @@ static NSString *k_empty = @"";
                     __unsafe_unretained id returnValue = nil;
                     [invocation getReturnValue:&returnValue];
                     if ([returnValue isKindOfClass:NSString.class]) {
-                        returnData = @{@"type": @"string", @"value": returnValue};
+                        returnData = @{k_type: k_string, k_value: returnValue};
                     } else {
                         _KSOCObject *returnObj = [_KSOCObject objectFromValue:returnValue];
-                        NSString *key = [NSString stringWithFormat:@"%p", returnValue];
+                        NSString *key = [NSString stringWithFormat:k_location_format, returnValue];
                         [objectPool setObject:returnObj forKey:key];
-                        returnData = @{@"type": @"object", @"className": NSStringFromClass([returnValue class]), @"objKey": key};
+                        returnData = @{k_type: k_object, k_className: NSStringFromClass([returnValue class]), k_objKey: key};
                     }
                 } else {
                     NSUInteger length = signature.methodReturnLength;
@@ -279,36 +298,36 @@ static NSString *k_empty = @"";
                     [invocation getReturnValue:buffer];
                     if (!strcmp(returnType, @encode(BOOL))) {
                         NSNumber *value = [NSNumber numberWithBool:*((BOOL*)buffer)];
-                        returnData = @{@"type": @"bool", @"value": value};
+                        returnData = @{k_type: k_bool, k_value: value};
                     } else if (!strcmp(returnType, @encode(float))) {
                         NSNumber *value = [NSNumber numberWithFloat:*((float*)buffer)];
-                        returnData = @{@"type": @"float", @"value": value};
+                        returnData = @{k_type: k_float, k_value: value};
                     } else if (!strcmp(returnType, @encode(double))) {
                         NSNumber *value = [NSNumber numberWithDouble:*((double*)buffer)];
-                        returnData = @{@"type": @"double", @"value": value};
+                        returnData = @{k_type: k_double, k_value: value};
                     } else if (!strcmp(returnType, @encode(int))) {
                         NSNumber *value = [NSNumber numberWithInt:*((int*)buffer)];
-                        returnData = @{@"type": @"int", @"value": value};
+                        returnData = @{k_type: k_int, k_value: value};
                     } else if (!strcmp(returnType, @encode(unsigned int))) {
                         NSNumber *value = [NSNumber numberWithUnsignedInt:*((unsigned int*)buffer)];
-                        returnData = @{@"type": @"uint", @"value": value};
+                        returnData = @{k_type: k_uint, k_value: value};
                     } else if (!strcmp(returnType, @encode(long))) {
                         NSNumber *value = [NSNumber numberWithLong:*((long*)buffer)];
-                        returnData = @{@"type": @"long", @"value": value};
+                        returnData = @{k_type: k_long, k_value: value};
                     } else if (!strcmp(returnType, @encode(unsigned long))) {
                         NSNumber *value = [NSNumber numberWithUnsignedLong:*((unsigned long*)buffer)];
-                        returnData = @{@"type": @"ulong", @"value": value};
+                        returnData = @{k_type: k_ulong, k_value: value};
                     } else if (!strcmp(returnType, @encode(long long))) {
                         NSNumber *value = [NSNumber numberWithLongLong:*((long long*)buffer)];
-                        returnData = @{@"type": @"longlong", @"value": value};
+                        returnData = @{k_type: k_longlong, k_value: value};
                     } else if (!strcmp(returnType, @encode(unsigned long long))) {
                         NSNumber *value = [NSNumber numberWithUnsignedLongLong:*((unsigned long long*)buffer)];
-                        returnData = @{@"type": @"ulonglong", @"value": value};
+                        returnData = @{k_type: k_ulonglong, k_value: value};
                     } else {
                         _KSOCObject *returnObj = [_KSOCObject locationFromValue:buffer];
-                        NSString *key = [NSString stringWithFormat:@"%p", buffer];
+                        NSString *key = [NSString stringWithFormat:k_location_format, buffer];
                         [objectPool setObject:returnObj forKey:key];
-                        returnData = @{@"type": @"other", @"objKey": key};
+                        returnData = @{k_type: k_other, k_objKey: key};
                     }
                 }
                 if (returnData) {

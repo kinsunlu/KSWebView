@@ -119,11 +119,6 @@ function viewDidDisappearOnApp(params) {//无需注册,当前页面消失时调�
     document.getElementById("label2").innerText = '当前网页已经不在App屏幕中了';
 }
 
-//function testReflection(params) {//反射调用示例
-//  var json = [{"className":"UIView","selectorString":"alloc","instructionType":"class_selector","selectorReturnValueName":"view"},{"selectorParams":[{"type":"basic_data","data":"{{200,200},{200,200}}","basicDataType":"CGRect"}],"selectorString":"initWithFrame:","instructionType":"obj_selector","objectName":"view"},{"className":"UIColor","selectorString":"redColor","instructionType":"class_selector","selectorReturnValueName":"redColor"},{"selectorParams":[{"type":"object_name","data":"redColor"}],"selectorString":"setBackgroundColor:","instructionType":"obj_selector","objectName":"view"},{"selectorReturnValueName":"selfView","selectorString":"view","instructionType":"obj_selector","objectName":"self"},{"selectorParams":[{"type":"object_name","data":"view"}],"selectorString":"addSubview:","instructionType":"obj_selector","objectName":"selfView"}];
-//  window.control.call('callReflection',JSON.stringify(json));
-//}
-
 function callJsMethod(method) {//app所有调用JS的方法都会在此分发
     if(typeof window[method] === 'function'){
         try {
