@@ -17,8 +17,8 @@
 ------
 
 ## 用JS语句的方式调用原生类/对象
-####例如我们想要在JS中执行下列OC代码
-#####Objective-C:
+#### 例如我们想要在JS中执行下列OC代码
+##### Objective-C:
 ```Objective-C
 UIViewController *vc = [[UIViewController alloc]init];
 [vc setTitle:@"测试标题"];
@@ -31,7 +31,7 @@ UIColor *whiteColor = [UIColor whiteColor];
 UINavigationController *nav = [[[UIApplication sharedApplication] keyWindow] rootViewController];
 [nav pushViewController:vc animated:YES];
 ```
-#####JavaScript:
+##### JavaScript:
 ```JavaScript
 //先导入要用到的OC类
 var tools = window.OCTools;
@@ -51,13 +51,13 @@ var nav = UIApplication.sharedApplication().keyWindow().rootViewController();
 nav.pushViewControlleranimated(vc, true);
 tools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 ```
-#####是不是很简单？只要先导入要用到的类，然后就和用JS写一个OC代码一样简单！需要注意的是，调用多个参数的方法时需要去掉所有的冒号，然后将参数一次按顺序放入传参括号内，就可以了。例如：
-#####Objective-C:
+##### 是不是很简单？只要先导入要用到的类，然后就和用JS写一个OC代码一样简单！需要注意的是，调用多个参数的方法时需要去掉所有的冒号，然后将参数一次按顺序放入传参括号内，就可以了。例如：
+##### Objective-C:
 ```Objective-C
 UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"描述信息" delegate:nil cancelButtonTitle:@"关闭" otherButtonTitles:nil];
 [alert show];
 ```
-#####JavaScript:
+##### JavaScript:
 ```JavaScript
 var UIAlertView = window.OCTools.importClass("UIAlertView");
 var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","描述信息",null,"关闭",null);
@@ -66,7 +66,7 @@ window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须�
 ```
 #### 返回值类型
 ##### 一切js可以识别的格式都是可以被js直接使用的(例如：string，number 等等).oc对象结构体等变量承接之后只可以当作方法传的值，因为js无法识别。这是必然，js是无法使用oc对象的。例如:
-#####Objective-C:
+##### Objective-C:
 ```Objective-C
 UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"描述信息" delegate:nil cancelButtonTitle:@"关闭" otherButtonTitles:nil];
 [alert setTag:15269];
@@ -75,7 +75,7 @@ NSInteger tag = [alert tag];
 NSString *title = [alert title];
 [alert show];
 ```
-#####JavaScript:
+##### JavaScript:
 ```JavaScript
 var UIAlertView = window.OCTools.importClass("UIAlertView");
 var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","描述信息",null,"关闭",null);
@@ -88,7 +88,7 @@ window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须�
 ```
 #### Dictionary与Array
 ###### 快速的将JS对象转换为NSDictionary或将JS数组转换为NSArray
-###### Dictionary:
+##### Dictionary:
 ```JavaScript
 var data = {
 'key': 'value',
@@ -102,7 +102,7 @@ var jsonString = dict.mj_JSONString();
 var jsObject = JSON.parse(jsonString);
 window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 ```
-###### Array:
+##### Array:
 ```JavaScript
 var data = ["NO.1", "NO.2", "NO.3", "NO.4"];
 //将JS对象转换为NSDictionary
