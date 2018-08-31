@@ -6,7 +6,6 @@
 //
 
 /*
- * 不建议使用下列实现来映射OC代码了请使用KSOCObjectTools
  * KSWebDataStorageModule为js与原生公用数据存储模块
  * 可自由互相监听,无缝对接,H5与原生都可以对某个数据进行监听,从而实现UI或数据上的更新
  */
