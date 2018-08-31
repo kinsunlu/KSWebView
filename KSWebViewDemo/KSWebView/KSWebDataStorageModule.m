@@ -81,8 +81,7 @@ static KSWebDataStorageModule *_instance;
 }
 
 +(void)setValue:(NSString*)value forKey:(NSString*)key {
-    KSWebDataStorageModule *storage = [self shareInstance];
-    [storage WD_setValue:value forKey:key];
+    [[self shareInstance] WD_setValue:value forKey:key];
 }
 
 -(void)WD_setValue:(NSString*)value forKey:(NSString*)key {
@@ -105,12 +104,40 @@ static KSWebDataStorageModule *_instance;
     }
 }
 
++(void)setKeyValueDictionary:(NSDictionary*)dictionary {
+    [[self shareInstance] WD_setKeyValueDictionary:dictionary];
+}
+
+-(void)WD_setKeyValueDictionary:(NSDictionary*)dictionary {
+    NSArray *allKeys = dictionary.allKeys;
+    if (allKeys.count != 0) {
+        @synchronized (self) {
+            NSMutableDictionary <NSString*, NSString*>*dataPool = self.dataPool;
+            NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = self.observerPool;
+            for (NSString *key in allKeys) {
+                NSString *value = [dictionary objectForKey:key];
+                NSString *stringValue = value.description;
+                NSString *oldValue = [dataPool objectForKey:key];
+                [dataPool setObject:stringValue forKey:key];
+                
+                NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:key];
+                NSArray <_WDObserverModel*>*m_array = observerArray.mutableCopy;
+                if (m_array) {
+                    for (_WDObserverModel *model in m_array) {
+                        [model executeWithArg:stringValue oldArg:oldValue];
+                    }
+                }
+            }
+        }
+    }
+}
+
 +(NSString*)valueForKey:(NSString*)key {
     KSWebDataStorageModule *storage = [self shareInstance];
     return [storage.dataPool objectForKey:key];
 }
 
-+(void)addObserverModel:(_WDObserverModel*)model forKeyPath:(NSString*)keyPath {
++(void)WD_addObserverModel:(_WDObserverModel*)model forKeyPath:(NSString*)keyPath {
     KSWebDataStorageModule *storage = [self shareInstance];
     @synchronized (storage) {
         NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
@@ -133,7 +160,7 @@ static KSWebDataStorageModule *_instance;
     _WDHtmlObserverModel *model = [[_WDHtmlObserverModel alloc]init];
     model.observer = webView;
     model.JSMethodName = JSMethodName;
-    [self addObserverModel:model forKeyPath:keyPath];
+    [self WD_addObserverModel:model forKeyPath:keyPath];
 }
 
 +(void)removeObserverWebView:(KSWebView*)webView forKeyPath:(NSString*)keyPath {
@@ -144,7 +171,7 @@ static KSWebDataStorageModule *_instance;
     _WDClientObserverModel *model = [[_WDClientObserverModel alloc]init];
     model.observer = observer;
     model.callback = callback;
-    [self addObserverModel:model forKeyPath:keyPath];
+    [self WD_addObserverModel:model forKeyPath:keyPath];
 }
 
 +(void)removeObserver:(id)observer forKeyPath:(NSString*)keyPath {
@@ -194,18 +221,21 @@ static KSWebDataStorageModule *_instance;
     NSString *body = message.body;
     if (body.length) {
         NSDictionary *dict = [body mj_JSONObject];
-        NSString *key = [dict objectForKey:@"key"];
-        NSString *value = [dict objectForKey:@"value"];
-        [self setValue:value forKey:key];
+        NSArray *allKeys = dict.allKeys;
+        if (allKeys.count > 1) {
+            [self setKeyValueDictionary:dict];
+        } else {
+            NSString *key = allKeys.firstObject;
+            NSString *value = [dict objectForKey:key];
+            [self setValue:value forKey:key];
+        }
     }
 }
 
 +(NSString*)scriptHandlerGetValue:(WKScriptMessage*)message {
     NSString *body = message.body;
     if (body.length) {
-        NSDictionary *dict = [body mj_JSONObject];
-        NSString *key = [dict objectForKey:@"key"];
-        return [self valueForKey:key];
+        return [self valueForKey:body];
     }
     return nil;
 }
@@ -215,8 +245,8 @@ static KSWebDataStorageModule *_instance;
     if (body.length) {
         KSWebView *webView = (KSWebView*)message.webView;
         NSDictionary *dict = [body mj_JSONObject];
-        NSString *keyPath = [dict objectForKey:@"key"];
-        NSString *JSMethodName = [dict objectForKey:@"method_name"];
+        NSString *keyPath = dict.allKeys.firstObject;
+        NSString *JSMethodName = [dict objectForKey:keyPath];
         [self addObserverWebView:webView JSMethodName:JSMethodName forKeyPath:keyPath];
     }
 }
@@ -225,9 +255,7 @@ static KSWebDataStorageModule *_instance;
     NSString *body = message.body;
     if (body.length) {
         KSWebView *webView = (KSWebView*)message.webView;
-        NSDictionary *dict = [body mj_JSONObject];
-        NSString *keyPath = [dict objectForKey:@"key"];
-        [self removeObserverWebView:webView forKeyPath:keyPath];
+        [self removeObserverWebView:webView forKeyPath:body];
     }
 }
 

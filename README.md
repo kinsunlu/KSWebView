@@ -116,5 +116,77 @@ window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须�
 其实本质上JS的对象/数组可以直接当做NSDictionary/NSArray参数传递，上述只是提供了互相转换的方法。
 ##### ***importClass***:  该方法在内部已经实现了不管你重复import多少次相同的Class都拿到的是相同的一个，所以放心大胆的用，不用担心，不过最好将其放在界面加载完成后importClass，防止出现问题。
 ##### ***releaseObjects***: 因为内部对象都是有引用的所以只有调用了此方法才会销毁所有对象，如果长期不销毁内存会越来越大，严重就会导致崩溃，所以请尽量在使用完oc调用后调用此方法来销毁所有oc对象。
+-----
 
-## 关于无缝JS与原生交互/本地数据存储模块支持KVO的介绍请查看demo
+## 本地数据存储模块与监听数据变化响应(KVO)
+#### 有时候我们在开发过程中会遇到很多与webView交互的需求，例如：在Html中有一个文本，该文本是用来显示用户评论数的，在原生有一个工具栏上面也有个显示评论数的label，当用户增加一条评论的时候两个数字都要变化，这时候就很麻烦了，我们用cookie存储的东西客户端拿不到，客户端存储的东西js又不好获得，这就有了客户端与webview公用存储空间。我们可以在客户端开辟一块内存专门用来存放html与原生公用的数据，如果对其添加了监听KVO变化，我们就可以在原生与html都收到更新会掉从而各自更新自己的界面数据。
+##### 那我们该如何使用这个存储模块呢？
+###### 向存储模块设置一个值：
+##### Objective-C:
+```Objective-C
+[KSWebDataStorageModule setValue:@"qwertyuiop" forKey:@"token"];
+```
+##### JavaScript:
+```JavaScript
+var json = {'token': 'qwertyuiop'}
+window.control.call('setValue',JSON.stringify(json));
+```
+###### 你还可以一次设置/更新多个值：
+##### Objective-C:
+```Objective-C
+NSDictionary *dict = @{@"token": @"qwertyuiop", @"state": @"1"};
+[KSWebDataStorageModule setKeyValueDictionary:dict];
+```
+##### JavaScript:
+```JavaScript
+var json = {'token': 'qwertyuiop', "state": "1"}
+window.control.call('setValue',JSON.stringify(json));
+```
+###### 向存储模块索要一个值：
+##### Objective-C:
+```Objective-C
+NSString *token = [KSWebDataStorageModule valueForKey:@"token"];
+```
+##### JavaScript:
+```JavaScript
+var token = window.control.call('getValue','token');
+```
+###### 对一个值添加监听者：
+##### Objective-C:
+```Objective-C
+[KSWebDataStorageModule addObserver:self callback:^(NSString *value, NSString *oldValue) {
+//变化后要执行的代码
+} forKeyPath:@"token"];
+```
+##### JavaScript:
+```JavaScript
+//注意！observerCallback为方法名，本质是通过js调用了名称为observerCallback的方法，会回传两个值第一个为最新的值，第二个为更新前的值
+var json = {'token': 'observerCallback'};
+window.control.call('addObserver',JSON.stringify(json));
+```
+ps.相同的webview如果多次注册一个值的监听的话是无效的只会回掉第一次注册的方法。
+###### 对一个值移除监听者：
+##### Objective-C:
+```Objective-C
+[KSWebDataStorageModule removeObserver:self forKeyPath:@"token"];
+```
+##### JavaScript:
+```JavaScript
+window.control.call('removeObserver','token');
+```
+###### 移除所有值的监听者：
+##### Objective-C:
+```Objective-C
+[KSWebDataStorageModule removeObserver:self];
+```
+##### JavaScript:
+```JavaScript
+window.control.call('removeCurrentObserver');
+```
+###### JS重置存储空间：
+##### JavaScript:
+```JavaScript
+window.control.call('reInit');
+```
+！需要注意的是，这块存储空间是单利所以也可用于不同webview之间的传值，打通webview之间的联系。
+## 更详细使用方法请查看demo

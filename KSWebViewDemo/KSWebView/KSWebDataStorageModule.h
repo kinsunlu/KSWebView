@@ -18,6 +18,7 @@
 //注册在KSWebView的回调句柄,不用手动设置,WebView初始化时已经注入了
 @property (nonatomic, readonly, class) NSDictionary <NSString*,KSWebViewScriptHandler*>*scriptHandlers;
 
++(void)setKeyValueDictionary:(NSDictionary*)dictionary;
 //将key为key的value设置为value
 +(void)setValue:(NSString*)value forKey:(NSString*)key;
 //获得key为key的value

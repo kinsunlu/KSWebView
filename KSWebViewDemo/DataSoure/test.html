@@ -63,33 +63,25 @@ function openNewPage(obj) {
 function setValue(obj) {
     var value = document.getElementById('settingValueInput').value;
     var json = {
-        key:'token',
-        value:value
+        'token': value
     }
     window.control.call('setValue',JSON.stringify(json));
 }
 
 function getValue(obj) {
-    var json = {
-        key:'token',
-    }
-    var value = window.control.call('getValue',JSON.stringify(json));
+    var value = window.control.call('getValue','token');
     window.control.call('alert',value);
 }
 
 function addObserver(obj) {
     var json = {
-        key:'token',
-        method_name:'observerCallback'
+        'token': 'observerCallback'
     }
     window.control.call('addObserver',JSON.stringify(json));
 }
 
 function removeObserver(obj) {
-    var json = {
-        key:'token',
-    }
-    window.control.call('removeObserver',JSON.stringify(json));
+    window.control.call('removeObserver','token');
 }
 
 function removeCurrentObserver(obj) {

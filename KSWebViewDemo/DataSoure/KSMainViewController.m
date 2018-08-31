@@ -7,6 +7,7 @@
 //
 
 #import "KSMainViewController.h"
+#import "KSWebDataStorageModule.h"
 
 @interface KSMainViewController ()
 
