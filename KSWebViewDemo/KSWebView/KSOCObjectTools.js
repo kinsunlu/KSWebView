@@ -1,5 +1,5 @@
 
-function __ksOCMethodTools(){}
+function __ksOCMethodTools () {}
 __ksOCMethodTools.prototype.importClass = window["__ksImportClass"];
 __ksOCMethodTools.prototype.releaseObjects = function () {
 	return window.control.call("__ks_releaseObjects");
@@ -8,7 +8,7 @@ __ksOCMethodTools.prototype.releaseObjects = function () {
 window.OCTools = new __ksOCMethodTools;
 window.OCTools.OCClass = {};
 
-function __ksInvokeOCObject(value, k_arguments, isClass) {
+function __ksInvokeOCObject (value, k_arguments, isClass) {
 	if (isClass) {
 		this.className = value;
 	} else {
@@ -63,7 +63,7 @@ function __ksImportClass (classString) {
   	return oc_class_obj;
 }
 
-function __ksGetMethodReturn(oc_class, objKey) {
+function __ksGetMethodReturn (oc_class, objKey) {
 	var oc_instance_obj;
 	if (oc_class !== undefined && oc_class !== null) {
 		var oc_instance = oc_class.__ks_instance_method;
