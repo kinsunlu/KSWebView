@@ -91,6 +91,7 @@ static NSString *k_location_format  = @"%p";
 static NSString *k_class            = @"class";
 static NSString *k_instance         = @"instance";
 static NSString *k_objKey           = @"objKey";
+static NSString *k_js_objKey        = @"__ks_objKey";
 static NSString *k_className        = @"className";
 static NSString *k_value            = @"value";
 static NSString *k_type             = @"type";
@@ -232,7 +233,7 @@ static KSOCObjectTools *_instance = nil;
                     param = nil;
                 } else if ([param isKindOfClass:NSDictionary.class]) {
                     NSDictionary *dict = param;
-                    NSString *objKey = [dict objectForKey:k_objKey];
+                    NSString *objKey = [dict objectForKey:k_js_objKey];
                     if (objKey != nil) {
                         _KSOCObject *obj = [objectPool objectForKey:objKey];
                         if (obj.isObject) {

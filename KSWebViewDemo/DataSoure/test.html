@@ -146,7 +146,7 @@ function importClass(className) {
 	nav.pushViewControlleranimated(vc, true);			
 	
 	var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","该页面调用代码没有任何一句OC语句完全由JS实现",null,"关闭",null);
-	alert.show();	
+	alert.show();
 	window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 }
     </script>

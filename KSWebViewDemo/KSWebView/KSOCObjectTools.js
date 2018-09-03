@@ -68,15 +68,6 @@ function __ksOCInstanceObject(funcName, objKey, params) {
 }
 
 function __ksInvokeOCMethod(funcName, target, params, isClass) {
-	for (var j in params) {
-		var param = params[j];
-		if (param !== null && typeof param === 'object') {
-			var o_objKey = param.__ks_objKey;
-			if (o_objKey !== undefined && o_objKey !== null) {
-				params[j] = { 'objKey': o_objKey };
-			}
-		}
-	}
  	var obj;
  	if (isClass) {
  		obj = new __ksOCClassObject(funcName,target,params);
