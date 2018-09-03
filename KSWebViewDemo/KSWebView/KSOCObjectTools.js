@@ -8,6 +8,16 @@ __ksOCMethodTools.prototype.releaseObjects = function () {
 window.OCTools = new __ksOCMethodTools;
 window.OCTools.OCClass = {};
 
+function __ksInvokeOCObject(value, k_arguments, isClass) {
+	if (isClass) {
+		this.className = value;
+	} else {
+		this.objKey = value;
+	}
+	this.funcName = k_arguments.callee.__ks_funcName;
+	this.params = Array.prototype.slice.call(k_arguments);
+}
+
 function __ksImportClass (classString) {
   	var occlass = window.OCTools.OCClass;
   	var oc_class_obj = occlass[classString];
@@ -24,9 +34,8 @@ function __ksImportClass (classString) {
 			var item = oc_instance[i];
 			function func () {
 				var objKey = this.__ks_objKey;
-				var funcName = arguments.callee.__ks_funcName;
-				var params = Array.prototype.slice.call(arguments);
-				return __ksInvokeOCMethod(funcName, objKey, params, false);
+				var value = new __ksInvokeOCObject(objKey, arguments, false);
+				return __ksInvokeOCMethod(value);
 			};
 			func.__ks_funcName = item;
 			instance_prototype[item] = func;
@@ -42,9 +51,8 @@ function __ksImportClass (classString) {
 			var item = oc_class[i];
 			function func () {
 				var className = this.__ks_className;
-				var funcName = arguments.callee.__ks_funcName;
-				var params = Array.prototype.slice.call(arguments);
-				return __ksInvokeOCMethod(funcName, className, params, true);
+				var value = new __ksInvokeOCObject(className, arguments, true);
+				return __ksInvokeOCMethod(value);
 			};
 			func.__ks_funcName = item;
 			class_prototype[item] = func;
@@ -53,30 +61,6 @@ function __ksImportClass (classString) {
   		occlass[classString] = oc_class_obj;
  	}
   	return oc_class_obj;
-}
-
-function __ksOCClassObject(funcName, className, params) {
-	this.funcName = funcName;
-	this.className = className;
-	this.params = params;
-}
-
-function __ksOCInstanceObject(funcName, objKey, params) {
-	this.funcName = funcName;
-	this.objKey = objKey;
-	this.params = params;
-}
-
-function __ksInvokeOCMethod(funcName, target, params, isClass) {
- 	var obj;
- 	if (isClass) {
- 		obj = new __ksOCClassObject(funcName,target,params);
- 	} else {
- 		obj = new __ksOCInstanceObject(funcName,target,params);
- 	}
- 	var json = JSON.stringify(obj);
- 	var returnString = window.control.call("__ks_invokeMethod", json);
- 	return __ksGetReturnValue(returnString);
 }
 
 function __ksGetMethodReturn(oc_class, objKey) {
@@ -91,7 +75,9 @@ function __ksGetMethodReturn(oc_class, objKey) {
 	return oc_instance_obj;
 }
 
-function __ksGetReturnValue (returnString) {
+function __ksInvokeOCMethod (value) {
+	var json = JSON.stringify(value);
+ 	var returnString = window.control.call("__ks_invokeMethod", json);
 	if (returnString !== undefined && returnString !== null){
 		var returnData = JSON.parse(returnString);
 		var type = returnData.type;
