@@ -120,7 +120,11 @@ static KSWebViewMemoryManager *_instance;
 }
 
 +(dispatch_queue_t)queue {
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    static dispatch_queue_t k_queue = nil;
+    if (k_queue == nil) {
+        k_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    }
+    return k_queue;
 }
 
 -(NSString *)syncLockToken {
