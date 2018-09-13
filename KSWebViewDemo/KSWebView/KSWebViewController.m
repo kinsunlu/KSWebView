@@ -8,15 +8,11 @@
 #import "KSConstants.h"
 #import "KSWebViewController.h"
 
-@interface KSWebViewController ()  {
+@implementation KSWebViewController {
     BOOL _isTerminateWebView;
 }
 
-@end
-
-@implementation KSWebViewController
-
--(void)viewWillAppear:(BOOL)animated{
+-(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self applicationWillEnterForeground];
 }
@@ -58,7 +54,7 @@
     [view addSubview:webView];
 }
 
--(void)loadWebView{
+-(void)loadWebView {
     if (_url.length) {
         [_webView loadWebViewWithURL:_url params:_params];
     } else if (_filePath.length) {
@@ -68,16 +64,16 @@
 
 #pragma mark - WKNavigationDelegate
 
-- (void)webView:(KSWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error{
+- (void)webView:(KSWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     NSLog(@"error=%@",error.localizedDescription);
     [webView resetProgressView];
 }
 
-- (void)webViewWebContentProcessDidTerminate:(KSWebView *)webView{
+- (void)webViewWebContentProcessDidTerminate:(KSWebView *)webView {
     _isTerminateWebView = YES;
 }
 
--(void)applicationWillEnterForeground{
+-(void)applicationWillEnterForeground {
     if (_isTerminateWebView) {
         _isTerminateWebView = NO;
         [self loadWebView];

@@ -358,7 +358,7 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 }
 
 -(void)willMoveToSuperview:(UIView *)newSuperview {
-    if (!newSuperview) {
+    if (newSuperview == nil) {
         self.scrollView.delegate = nil;
     }
     [super willMoveToSuperview:newSuperview];

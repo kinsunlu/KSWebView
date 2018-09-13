@@ -25,7 +25,7 @@
 @implementation _WDClientObserverModel
 
 -(void)executeWithArg:(id)arg oldArg:(id)oldArg {
-    if (self.observer && _callback) {
+    if (self.observer != nil && _callback != nil) {
         _callback(arg, oldArg);
     }
 }
@@ -44,7 +44,7 @@
 
 -(void)executeWithArg:(id)arg oldArg:(id)oldArg {
     KSWebView *webView = self.observer;
-    if (webView && _JSMethodName) {
+    if (webView != nil && _JSMethodName != nil) {
         NSString *js = nil;
         if (oldArg) {
             js = [NSString stringWithFormat:@"%@','%@','%@", _JSMethodName, arg, oldArg];
@@ -84,20 +84,6 @@ static KSWebDataStorageModule *_instance;
         });
     }
     return _instance;
-}
-
--(NSString *)dataPoolLockToken {
-    if (_dataPoolLockToken == nil) {
-        _dataPoolLockToken = [NSString stringWithFormat:@"dataPoolLockToken"];
-    }
-    return _dataPoolLockToken;
-}
-
--(NSString *)observerPoolLockToken {
-    if (_observerPoolLockToken == nil) {
-        _observerPoolLockToken = [NSString stringWithFormat:@"observerPoolLockToken"];
-    }
-    return _observerPoolLockToken;
 }
 
 +(void)setValue:(NSString*)value forKey:(NSString*)key {
@@ -310,6 +296,20 @@ static KSWebDataStorageModule *_instance;
         _dataPool = [NSMutableDictionary dictionary];
     }
     return _dataPool;
+}
+
+-(NSString *)dataPoolLockToken {
+    if (_dataPoolLockToken == nil) {
+        _dataPoolLockToken = [NSString stringWithFormat:@"dataPoolLockToken"];
+    }
+    return _dataPoolLockToken;
+}
+
+-(NSString *)observerPoolLockToken {
+    if (_observerPoolLockToken == nil) {
+        _observerPoolLockToken = [NSString stringWithFormat:@"observerPoolLockToken"];
+    }
+    return _observerPoolLockToken;
 }
 
 -(NSDictionary<NSString *,KSWebViewScriptHandler *> *)scriptHandlers {
