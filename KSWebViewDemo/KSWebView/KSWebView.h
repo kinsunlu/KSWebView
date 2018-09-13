@@ -48,7 +48,7 @@ FOUNDATION_EXPORT NSString * const k_CallJsMethod;
 -(void)resetProgressView;
 
 /*
- * @methodName H5定义的方法名 //更改宏定义k_CallJsMethod 即可更改统一的方法名
+ * @methodName H5定义的方法名 //更改k_CallJsMethod 即可更改统一的方法名
  * 有多个参数就生成为 @"methodName','arg1','arg2" 这样的string设置给methodName(因为方法内部已经有两个单引号了所以前面和后面没有...)
  * 该方法是为了H5方便,调用该方法会统一调用一个H5方法,然后通过参数(methodName)让H5方便统计一些信息.
  * 默认H5返回没有的方法的错误码为-999 ,如果调用了H5不存在的方法请H5主动返回-999就可以了.
