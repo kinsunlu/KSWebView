@@ -13,22 +13,28 @@
 
 @end
 
-#define k_EstimatedProgress     @"estimatedProgress"
-#define k_WebViewTitle          @"title"
-#define k_GetVideoTag           @"document.getElementsByTagName('video')"
-#define k_WebViewBridgeIndexKey @"__ks_web_bridge_"
-
-static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function __getKsJsBridge(){return{call:function(b,a){return prompt(window.__ks_bridge_index+b,a)}}}window.control=__getKsJsBridge()";
-
 #import "KSWebDataStorageModule.h"
 #import "KSWebViewMemoryManager.h"
 #import "KSOCObjectTools.h"
 #import "KSConstants.h"
 
+NSString * const k_EstimatedProgress        = @"estimatedProgress";
+NSString * const k_WebViewTitle             = @"title";
+NSString * const k_GetVideoTag              = @"document.getElementsByTagName('video')";
+NSString * const k_WebViewBridgeIndexKey    = @"__ks_web_bridge_";
+NSString * const k_INIT_SCRIPT              = @"__ks_bridge_index = '%@';function __getKsJsBridge(){return{call:function(b,a){return prompt(window.__ks_bridge_index+b,a)}}}window.control=__getKsJsBridge()";
+
+NSString * const k_BlankPage                = @"about:blank";
+NSString * const k_WebViewDidAppear         = @"viewDidAppearOnApp";
+NSString * const k_WebViewDidDisappear      = @"viewDidDisappearOnApp";
+NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
+
 @interface KSWebView () <WKUIDelegate> {
     __weak UIImageView *_screenshotView;
     __weak id<WKUIDelegate> _UIDelegate;
 }
+
+@property (nonatomic, class, readonly) NSArray<WKUserScript*>*initUserScripts;
 
 @end
 
@@ -42,22 +48,13 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
 
 -(instancetype)initWithFrame:(CGRect)frame delegate:(id<WKNavigationDelegate>)delegate {
     WKUserContentController *userContentController = [[WKUserContentController alloc] init];
-    
-    NSString *noSelectCss = [KSWebView javascriptCodeWithCss:@"-webkit-touch-callout:none;"];
-    WKUserScript *noneSelectScript = [[WKUserScript alloc] initWithSource:noSelectCss injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
-    [userContentController addUserScript:noneSelectScript];
-    
-    NSString *initCss = [NSString stringWithFormat:k_INIT_SCRIPT, k_WebViewBridgeIndexKey];
-    WKUserScript *initScript = [[WKUserScript alloc] initWithSource:initCss injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
-    [userContentController addUserScript:initScript];
-    
-    NSString *oc_object_tools = KSOCObjectTools.initJavaScriptString;
-    WKUserScript *toolsScript = [[WKUserScript alloc] initWithSource:oc_object_tools injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
-    [userContentController addUserScript:toolsScript];
+    for (WKUserScript *script in KSWebView.initUserScripts)
+        [userContentController addUserScript:script];
     
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     configuration.allowsInlineMediaPlayback = NO;
     configuration.userContentController = userContentController;
+    
     if (self = [super initWithFrame:frame configuration:configuration]) {
         self.navigationDelegate = delegate;
         super.UIDelegate = self;
@@ -97,14 +94,14 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     CGFloat windowWidth = self.frame.size.width;
     k_creatFrameElement;
     viewW=_progressView.frame.size.width;
-    viewH=windowWidth*0.008;
+    viewH=windowWidth*0.008f;
     viewY=self.scrollView.contentInset.top;
     k_settingFrame(_progressView);
 }
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (object == self) {
-        if ([keyPath isEqualToString:k_EstimatedProgress]) {
+        if (keyPath == k_EstimatedProgress) {
             NSString *url = self.URL.absoluteString;
             if (![url isEqualToString:k_BlankPage]) {
                 double estimatedProgress = self.estimatedProgress;
@@ -121,7 +118,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
                     }
                 }];
             }
-        } else if (_webViewTitleChangedCallback && [keyPath isEqualToString:k_WebViewTitle]) {
+        } else if (_webViewTitleChangedCallback && keyPath == k_WebViewTitle) {
             _webViewTitleChangedCallback(self.title);
         }
     }
@@ -186,9 +183,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
                 }
             }
             if (notHasReturnValue) return;
-        } else {
-            returnValue = @"-999";
-        }
+        } else returnValue = @"-999";
         completionHandler(returnValue);
     } else if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
         [_UIDelegate webView:webView runJavaScriptTextInputPanelWithPrompt:prompt defaultText:body initiatedByFrame:frame completionHandler:completionHandler];
@@ -218,17 +213,17 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     }
 }
 
--(void)setCssArray:(NSArray<NSString *> *)cssArray {
-    _cssArray = cssArray;
-    if (cssArray.count) {
-        NSMutableString *cssString = [NSMutableString string];
-        for (NSString *css in cssArray) {
-            [cssString appendString:css];
+-(void)setHtmlElementArray:(NSArray<NSString *> *)elementArray {
+    _htmlElementArray = elementArray;
+    if (elementArray.count) {
+        NSMutableString *elementString = [NSMutableString string];
+        for (NSString *css in elementArray) {
+            [elementString appendString:css];
         }
-        if (cssString.length) {
-            NSString *javascript = [KSWebView javascriptCodeWithCss:cssString];
-            WKUserScript *selectScript = [[WKUserScript alloc] initWithSource:javascript injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
-            [self.configuration.userContentController addUserScript:selectScript];
+        if (elementString.length) {
+            NSString *javascript = [KSWebView createElementWithJavaScript:elementString];
+            WKUserScript *script = [[WKUserScript alloc] initWithSource:javascript injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
+            [self.configuration.userContentController addUserScript:script];
         }
     }
 }
@@ -369,14 +364,30 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     [super willMoveToSuperview:newSuperview];
 }
 
-+(NSString*)javascriptCodeWithCss:(NSString*)css {
-    NSString *javascript = [NSString stringWithFormat:@"var style = document.createElement('style');style.type = 'text/css';var cssContent = document.createTextNode('body{%@}');style.appendChild(cssContent);document.body.appendChild(style);",css];
++(NSArray<WKUserScript *> *)initUserScripts {
+    static NSArray<WKUserScript *> *k_initUserScripts = nil;
+    if (k_initUserScripts == nil) {
+        NSString *noSelectCss = [self createElementWithJavaScript:@"-webkit-touch-callout:none;"];
+        WKUserScript *noneSelectScript = [[WKUserScript alloc] initWithSource:noSelectCss injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
+        
+        NSString *scriptEntrance = [NSString stringWithFormat:k_INIT_SCRIPT, k_WebViewBridgeIndexKey];
+        WKUserScript *initScript = [[WKUserScript alloc] initWithSource:scriptEntrance injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+        
+        NSString *oc_object_tools = KSOCObjectTools.initJavaScriptString;
+        WKUserScript *toolsScript = [[WKUserScript alloc] initWithSource:oc_object_tools injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
+        k_initUserScripts = @[noneSelectScript, initScript, toolsScript];
+    }
+    return k_initUserScripts;
+}
+
++(NSString*)createElementWithJavaScript:(NSString*)code {
+    NSString *javascript = [NSString stringWithFormat:@"var style = document.createElement('style');style.type = 'text/css';var cssContent = document.createTextNode('body{%@}');style.appendChild(cssContent);document.body.appendChild(style);", code];
     return javascript;
 }
 
 -(void)dealloc {
     self.navigationDelegate = nil;
-    self.UIDelegate = nil;
+    super.UIDelegate = nil;
     [KSWebDataStorageModule removeObserver:self];
     [self removeObserver:self forKeyPath:k_EstimatedProgress];
     [self removeObserver:self forKeyPath:k_WebViewTitle];
@@ -397,7 +408,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSUInteger count) {
             if (index < count) {
-                NSString * durationString = [NSString stringWithFormat:@"%@[%td].duration.toFixed(1)",k_GetVideoTag,index];
+                NSString * durationString = [NSString stringWithFormat:@"%@[%td].duration.toFixed(1)", k_GetVideoTag, index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
                     if (callback) callback(result.doubleValue);
                 }];
@@ -411,7 +422,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSUInteger count) {
             if (index < count) {
-                NSString * durationString = [NSString stringWithFormat:@"%@[%td].currentTime.toFixed(1)",k_GetVideoTag,index];
+                NSString * durationString = [NSString stringWithFormat:@"%@[%td].currentTime.toFixed(1)", k_GetVideoTag, index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
                     if (callback) callback(result.doubleValue);
                 }];
@@ -424,7 +435,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     __weak typeof(self) weakSelf = self;
     [self videoPlayerCount:^(NSUInteger count) {
         if (index < count) {
-            NSString *playString = [NSString stringWithFormat:@"%@[%td].play()",k_GetVideoTag,index];
+            NSString *playString = [NSString stringWithFormat:@"%@[%td].play()", k_GetVideoTag, index];
             [weakSelf evaluateJavaScript:playString completionHandler:nil];
         }
     }];
@@ -434,7 +445,7 @@ static NSString * _Nonnull k_INIT_SCRIPT = @"__ks_bridge_index = '%@';function _
     __weak typeof(self) weakSelf = self;
     [self videoPlayerCount:^(NSUInteger count) {
         if (count > 0) {
-            NSString *pauseString = [NSString stringWithFormat:@"var dom = %@;for(var i = 0; i < dom.length; i++){dom[i].pause();}",k_GetVideoTag];
+            NSString *pauseString = [NSString stringWithFormat:@"var dom = %@;for(var i = 0; i < dom.length; i++){dom[i].pause();}", k_GetVideoTag];
             [weakSelf evaluateJavaScript:pauseString completionHandler:nil];
         }
     }];

@@ -64,20 +64,40 @@
 @interface KSWebDataStorageModule ()
 
 @property (nonatomic, strong, readonly) NSMutableDictionary <NSString*, NSString*>*dataPool;
+@property (nonatomic, copy, readonly) NSString *dataPoolLockToken;
 @property (nonatomic, strong, readonly) NSMutableDictionary <NSString*, NSMutableArray<_WDObserverModel*>*>*observerPool;
+@property (nonatomic, copy, readonly) NSString *observerPoolLockToken;
 @property (nonatomic, strong, readonly) NSDictionary <NSString*,KSWebViewScriptHandler*>*scriptHandlers;
 
 @end
 
 @implementation KSWebDataStorageModule
-@synthesize dataPool = _dataPool, observerPool = _observerPool, scriptHandlers = _scriptHandlers;
+@synthesize dataPool = _dataPool, observerPool = _observerPool, scriptHandlers = _scriptHandlers,
+dataPoolLockToken = _dataPoolLockToken, observerPoolLockToken = _observerPoolLockToken;
 
 static KSWebDataStorageModule *_instance;
 +(instancetype)shareInstance {
     if (_instance == nil) {
-        _instance = [[self alloc]init];
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            _instance = [[self alloc]init];
+        });
     }
     return _instance;
+}
+
+-(NSString *)dataPoolLockToken {
+    if (_dataPoolLockToken == nil) {
+        _dataPoolLockToken = [NSString stringWithFormat:@"dataPoolLockToken"];
+    }
+    return _dataPoolLockToken;
+}
+
+-(NSString *)observerPoolLockToken {
+    if (_observerPoolLockToken == nil) {
+        _observerPoolLockToken = [NSString stringWithFormat:@"observerPoolLockToken"];
+    }
+    return _observerPoolLockToken;
 }
 
 +(void)setValue:(NSString*)value forKey:(NSString*)key {
@@ -85,18 +105,19 @@ static KSWebDataStorageModule *_instance;
 }
 
 -(void)WD_setValue:(NSString*)value forKey:(NSString*)key {
-    if (value && key) {
-        @synchronized (self) {
-            NSString *stringValue = value.description;
-            NSMutableDictionary <NSString*, NSString*>*dataPool = self.dataPool;
-            NSString *oldValue = [dataPool objectForKey:key];
+    if (value != nil && key != nil) {
+        NSString *stringValue = value.description;
+        NSMutableDictionary <NSString*, NSString*>*dataPool = self.dataPool;
+        NSString *oldValue = nil;
+        @synchronized (self.dataPoolLockToken) {
+            oldValue = [dataPool objectForKey:key];
             [dataPool setObject:stringValue forKey:key];
-            
-            NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = self.observerPool;
+        }
+        NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = self.observerPool;
+        @synchronized (self.observerPoolLockToken) {
             NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:key];
-            NSArray <_WDObserverModel*>*m_array = observerArray.mutableCopy;
-            if (m_array) {
-                for (_WDObserverModel *model in m_array) {
+            if (observerArray != nil && observerArray.count != 0) {
+                for (_WDObserverModel *model in observerArray) {
                     [model executeWithArg:stringValue oldArg:oldValue];
                 }
             }
@@ -110,20 +131,21 @@ static KSWebDataStorageModule *_instance;
 
 -(void)WD_setKeyValueDictionary:(NSDictionary*)dictionary {
     NSArray *allKeys = dictionary.allKeys;
-    if (allKeys.count != 0) {
-        @synchronized (self) {
-            NSMutableDictionary <NSString*, NSString*>*dataPool = self.dataPool;
-            NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = self.observerPool;
-            for (NSString *key in allKeys) {
-                NSString *value = [dictionary objectForKey:key];
-                NSString *stringValue = value.description;
-                NSString *oldValue = [dataPool objectForKey:key];
+    if (allKeys != nil && allKeys.count != 0) {
+        NSMutableDictionary <NSString*, NSString*>*dataPool = self.dataPool;
+        NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = self.observerPool;
+        for (NSString *key in allKeys) {
+            NSString *value = [dictionary objectForKey:key];
+            NSString *stringValue = value.description;
+            NSString *oldValue = nil;
+            @synchronized (self.dataPoolLockToken) {
+                oldValue = [dataPool objectForKey:key];
                 [dataPool setObject:stringValue forKey:key];
-                
+            }
+            @synchronized (self.observerPoolLockToken) {
                 NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:key];
-                NSArray <_WDObserverModel*>*m_array = observerArray.mutableCopy;
-                if (m_array) {
-                    for (_WDObserverModel *model in m_array) {
+                if (observerArray != nil && observerArray.count != 0) {
+                    for (_WDObserverModel *model in observerArray) {
                         [model executeWithArg:stringValue oldArg:oldValue];
                     }
                 }
@@ -139,14 +161,12 @@ static KSWebDataStorageModule *_instance;
 
 +(void)WD_addObserverModel:(_WDObserverModel*)model forKeyPath:(NSString*)keyPath {
     KSWebDataStorageModule *storage = [self shareInstance];
-    @synchronized (storage) {
-        NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+    NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+    @synchronized (storage.observerPoolLockToken) {
         NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:keyPath];
         if (observerArray) {
             for (_WDObserverModel *k_model in observerArray) {
-                if (k_model.observer == model.observer) {
-                    return;
-                }
+                if (k_model.observer == model.observer) return;
             }
         } else {
             observerArray = [NSMutableArray array];
@@ -176,8 +196,8 @@ static KSWebDataStorageModule *_instance;
 
 +(void)removeObserver:(id)observer forKeyPath:(NSString*)keyPath {
     KSWebDataStorageModule *storage = [self shareInstance];
-    @synchronized (storage) {
-        NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+    NSMutableDictionary<NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+    @synchronized (storage.observerPoolLockToken) {
         NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:keyPath];
         if (observerArray) {
             for (_WDObserverModel *model in observerArray) {
@@ -195,10 +215,10 @@ static KSWebDataStorageModule *_instance;
 
 +(void)removeObserver:(id)observer {
     KSWebDataStorageModule *storage = [self shareInstance];
-    @synchronized (storage) {
-        NSMutableDictionary <NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
-        NSArray <NSString*>*allKeys = observerPool.allKeys;
-        if (allKeys.count) {
+    NSMutableDictionary <NSString*,NSMutableArray<_WDObserverModel*>*>*observerPool = storage.observerPool;
+    NSArray <NSString*>*allKeys = observerPool.allKeys;
+    if (allKeys.count) {
+        @synchronized (storage.observerPoolLockToken) {
             for (NSString *key in allKeys) {
                 NSMutableArray <_WDObserverModel*>*observerArray = [observerPool objectForKey:key];
                 NSMutableArray <_WDObserverModel*>*removeObserverArray = [NSMutableArray array];
@@ -266,15 +286,15 @@ static KSWebDataStorageModule *_instance;
 
 +(void)scriptHandlerreinitDataStorage {
     KSWebDataStorageModule *storage = [self shareInstance];
-    @synchronized (storage) {
-        NSMutableDictionary <NSString *,NSMutableArray<_WDObserverModel *> *> *observerPool = storage.observerPool;
-        if (observerPool && observerPool.allKeys.count) {
+    NSMutableDictionary <NSString *,NSMutableArray<_WDObserverModel *> *> *observerPool = storage.observerPool;
+    @synchronized (storage.observerPoolLockToken) {
+        if (observerPool && observerPool.allKeys.count)
             [observerPool removeAllObjects];
-        }
-        NSMutableDictionary<NSString *,NSString *> *dataPool = storage.dataPool;
-        if (dataPool.allKeys.count) {
+    }
+    NSMutableDictionary<NSString *,NSString *> *dataPool = storage.dataPool;
+    @synchronized (storage.dataPoolLockToken) {
+        if (dataPool.allKeys.count)
             [dataPool removeAllObjects];
-        }
     }
 }
 

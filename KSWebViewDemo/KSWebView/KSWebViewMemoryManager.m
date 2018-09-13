@@ -33,15 +33,20 @@
 
 @property (nonatomic, strong) NSMutableArray <_KSWebViewMemoryManagerItem*>*webViewPool;
 @property (nonatomic, readonly, class) dispatch_queue_t queue;
+@property (nonatomic, readonly, copy) NSString *syncLockToken;
 
 @end
 
 @implementation KSWebViewMemoryManager
+@synthesize syncLockToken = _syncLockToken;
 
 static KSWebViewMemoryManager *_instance;
 +(instancetype)shareInstance {
     if (_instance == nil) {
-        _instance = [[self alloc]init];
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            _instance = [[self alloc]init];
+        });
     }
     return _instance;
 }
@@ -75,31 +80,31 @@ static KSWebViewMemoryManager *_instance;
 }
 
 -(void)checkReleaseInWebViewPool {
-    @synchronized (self) {
-        dispatch_async(KSWebViewMemoryManager.queue, ^{
-            NSMutableArray <_KSWebViewMemoryManagerItem*>*webViewPool = self.webViewPool;
-            NSLog(@"正在检查webViewPool,现有%td个对象在池中",webViewPool.count);
-            NSMutableArray <_KSWebViewMemoryManagerItem*>*releasePool = [NSMutableArray array];
-            NSTimeInterval nowTime = [NSDate date].timeIntervalSince1970;
-            for (_KSWebViewMemoryManagerItem *item in webViewPool.mutableCopy) {
-                NSTimeInterval itemTime = item.timeInterval;
-                if (nowTime - itemTime > 10.f) {
-                    KSWebView *webView = item.webView;//模型内一个引用,现在这个指针一个引用所以是2
-                    NSUInteger count = [[webView valueForKey:@"retainCount"] unsignedIntegerValue];
-                    if (count <= 2) {
-                        [releasePool addObject:item];
-                    }
+    dispatch_async(KSWebViewMemoryManager.queue, ^{
+        NSMutableArray <_KSWebViewMemoryManagerItem*>*webViewPool = self.webViewPool;
+        NSLog(@"正在检查webViewPool,现有%td个对象在池中",webViewPool.count);
+        NSMutableArray <_KSWebViewMemoryManagerItem*>*releasePool = [NSMutableArray array];
+        NSTimeInterval nowTime = [NSDate date].timeIntervalSince1970;
+        for (_KSWebViewMemoryManagerItem *item in webViewPool.mutableCopy) {
+            NSTimeInterval itemTime = item.timeInterval;
+            if (nowTime - itemTime > 10.f) {
+                KSWebView *webView = item.webView;//模型内一个引用,现在这个指针一个引用所以是2
+                NSUInteger count = [[webView valueForKey:@"retainCount"] unsignedIntegerValue];
+                if (count <= 2) {
+                    [releasePool addObject:item];
                 }
             }
+        }
+        @synchronized (self.syncLockToken) {
             if (releasePool.count) {
                 NSLog(@"检查有%td个webView没有引用正在释放...",releasePool.count);
                 [webViewPool removeObjectsInArray:releasePool];
             }
-            if (!webViewPool.count) {
-                [self stopChecking];
-            }
-        });
-    }
+        }
+        if (!webViewPool.count) {
+            [self stopChecking];
+        }
+    });
 }
 
 +(void)releaseAllWebView {
@@ -116,6 +121,13 @@ static KSWebViewMemoryManager *_instance;
 
 +(dispatch_queue_t)queue {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+}
+
+-(NSString *)syncLockToken {
+    if (_syncLockToken == nil) {
+        _syncLockToken = [NSString stringWithFormat:@"syncLockToken"];
+    }
+    return _syncLockToken;
 }
 
 @end

@@ -5,13 +5,13 @@
 //  Copyright © 2018年 kinsun. All rights reserved.
 //
 
-#define k_BlankPage           @"about:blank"
-#define k_WebViewDidAppear    @"viewDidAppearOnApp"
-#define k_WebViewDidDisappear @"viewDidDisappearOnApp"
-#define k_CallJsMethod        @"javascript:callJsMethod('%@')"
-
 #import <WebKit/WebKit.h>
 #import "KSWebViewScriptHandler.h"
+
+FOUNDATION_EXPORT NSString * const k_BlankPage;
+FOUNDATION_EXPORT NSString * const k_WebViewDidAppear;
+FOUNDATION_EXPORT NSString * const k_WebViewDidDisappear;
+FOUNDATION_EXPORT NSString * const k_CallJsMethod;
 
 @interface KSWebView : WKWebView
 
@@ -24,7 +24,7 @@
  * webview加载前需要注入的css或者html信息
  * loadrequest之前设置
  */
-@property (nonatomic, strong) NSArray <NSString*>*cssArray;
+@property (nonatomic, strong) NSArray <NSString*>*htmlElementArray;
 /*
  * webview加载前时的HTTPHeaders
  * loadrequest之前设置

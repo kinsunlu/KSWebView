@@ -72,9 +72,9 @@
 
 @implementation _KSOCClassInfoModel @end
 
-#import "GOModel.h"
+#import "KSModel.h"
 
-@interface _KSOCInvokeModel : GOModel
+@interface _KSOCInvokeModel : KSModel
 
 @property (nonatomic, copy) NSString *objKey;
 @property (nonatomic, copy) NSString *funcName;
@@ -85,28 +85,28 @@
 
 @implementation _KSOCInvokeModel @end
 
-static NSString *k_colon            = @":";
-static NSString *k_empty            = @"";
-static NSString *k_location_format  = @"%p";
-static NSString *k_class            = @"class";
-static NSString *k_instance         = @"instance";
-static NSString *k_objKey           = @"objKey";
-static NSString *k_js_objKey        = @"__ks_objKey";
-static NSString *k_className        = @"className";
-static NSString *k_value            = @"value";
-static NSString *k_type             = @"type";
-static NSString *k_other            = @"other";
-static NSString *k_object           = @"object";
-static NSString *k_string           = @"string";
-static NSString *k_bool             = @"bool";
-static NSString *k_float            = @"float";
-static NSString *k_double           = @"double";
-static NSString *k_int              = @"int";
-static NSString *k_uint             = @"uint";
-static NSString *k_long             = @"long";
-static NSString *k_ulong            = @"ulong";
-static NSString *k_longlong         = @"longlong";
-static NSString *k_ulonglong        = @"ulonglong";
+NSString * const k_colon            = @":";
+NSString * const k_empty            = @"";
+NSString * const k_location_format  = @"%p";
+NSString * const k_class            = @"class";
+NSString * const k_instance         = @"instance";
+NSString * const k_objKey           = @"objKey";
+NSString * const k_js_objKey        = @"__ks_objKey";
+NSString * const k_className        = @"className";
+NSString * const k_value            = @"value";
+NSString * const k_type             = @"type";
+NSString * const k_other            = @"other";
+NSString * const k_object           = @"object";
+NSString * const k_string           = @"string";
+NSString * const k_bool             = @"bool";
+NSString * const k_float            = @"float";
+NSString * const k_double           = @"double";
+NSString * const k_int              = @"int";
+NSString * const k_uint             = @"uint";
+NSString * const k_long             = @"long";
+NSString * const k_ulong            = @"ulong";
+NSString * const k_longlong         = @"longlong";
+NSString * const k_ulonglong        = @"ulonglong";
 
 #import <WebKit/WKScriptMessage.h>
 #import "KSWebViewScriptHandler.h"
@@ -115,41 +115,34 @@ static NSString *k_ulonglong        = @"ulonglong";
 @interface KSOCObjectTools ()
 
 @property (nonatomic, strong, readonly) NSMutableDictionary <NSString *, _KSOCClassInfoModel*>*catalog;
+@property (nonatomic, readonly, copy) NSString *catalogLockToken;
 @property (nonatomic, strong, readonly) NSMutableDictionary <NSString *, _KSOCObject*>*objectPool;
+@property (nonatomic, readonly, copy) NSString *objectPoolLockToken;
 
 @end
 
 @implementation KSOCObjectTools
-@synthesize catalog = _catalog, objectPool = _objectPool;
+@synthesize catalog = _catalog, objectPool = _objectPool,
+catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken;
 
 static KSOCObjectTools *_instance = nil;
 +(instancetype)share {
     if (_instance == nil) {
-        _instance = [[self alloc]init];
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            _instance = [[self alloc]init];
+        });
     }
     return _instance;
 }
 
-- (NSMutableDictionary<NSString *, _KSOCClassInfoModel*>*)catalog {
-    if (!_catalog) {
-        _catalog = [NSMutableDictionary dictionary];
-    }
-    return _catalog;
-}
-
-- (NSMutableDictionary<NSString *,_KSOCObject*> *)objectPool {
-    if (!_objectPool) {
-        _objectPool = [NSMutableDictionary dictionary];
-    }
-    return _objectPool;
-}
-
 +(NSString*)scriptHandlerImportClass:(WKScriptMessage*)message {
     NSString *body = message.body;
-    if (body.length) {
+    if (body != nil && body.length != 0) {
         Class class = NSClassFromString(body);
-        if (class) {
-            NSMutableDictionary <NSString *,_KSOCClassInfoModel*>*catalog = [KSOCObjectTools share].catalog;
+        if (class != nil) {
+            KSOCObjectTools *tools = [KSOCObjectTools share];
+            NSMutableDictionary <NSString *,_KSOCClassInfoModel*>*catalog = tools.catalog;
             NSMutableArray <NSString*>* classMethodNameArray = [NSMutableArray array];
             NSMutableArray <NSString*>* instanceMethodNameArray = [NSMutableArray array];
             while (class != nil) {
@@ -157,7 +150,9 @@ static KSOCObjectTools *_instance = nil;
                 _KSOCClassInfoModel *info = [catalog objectForKey:classNameKey];
                 if (!info) {
                     info = [self methodFromClass:class];
-                    [catalog setObject:info forKey:classNameKey];
+                    @synchronized (tools.catalogLockToken) {
+                        [catalog setObject:info forKey:classNameKey];
+                    }
                 }
                 [classMethodNameArray addObjectsFromArray:info.classMethod.allKeys];
                 [instanceMethodNameArray addObjectsFromArray:info.instanceMethod.allKeys];
@@ -198,7 +193,7 @@ static KSOCObjectTools *_instance = nil;
 
 +(NSString*)scriptHandlerInvokeClassMethod:(WKScriptMessage*)message {
     NSString *body = message.body;
-    if (body.length) {
+    if (body != nil && body.length != 0) {
         _KSOCInvokeModel *model = [_KSOCInvokeModel objectWithKeyValues:body];
         NSString *funcName = model.funcName;
         NSString *className = model.className;
@@ -290,7 +285,9 @@ static KSOCObjectTools *_instance = nil;
                     } else {
                         _KSOCObject *returnObj = [_KSOCObject objectFromValue:returnValue];
                         NSString *key = [NSString stringWithFormat:k_location_format, returnValue];
-                        [objectPool setObject:returnObj forKey:key];
+                        @synchronized (tools.objectPoolLockToken) {
+                            [objectPool setObject:returnObj forKey:key];
+                        }
                         returnData = @{k_type: k_object, k_className: NSStringFromClass([returnValue class]), k_objKey: key};
                     }
                 } else {
@@ -327,11 +324,13 @@ static KSOCObjectTools *_instance = nil;
                     } else {
                         _KSOCObject *returnObj = [_KSOCObject locationFromValue:buffer];
                         NSString *key = [NSString stringWithFormat:k_location_format, buffer];
-                        [objectPool setObject:returnObj forKey:key];
+                        @synchronized (tools.objectPoolLockToken) {
+                            [objectPool setObject:returnObj forKey:key];
+                        }
                         returnData = @{k_type: k_other, k_objKey: key};
                     }
                 }
-                if (returnData) {
+                if (returnData != nil) {
                     return returnData.mj_JSONString;
                 }
             }
@@ -354,9 +353,8 @@ static KSOCObjectTools *_instance = nil;
     [[KSOCObjectTools share].objectPool removeAllObjects];
 }
 
-static NSString *k_initJavaScriptString = nil;
-
 +(NSString *)initJavaScriptString {
+    static NSString *k_initJavaScriptString = nil;
     if (k_initJavaScriptString == nil) {
         NSString *path = [[NSBundle mainBundle] pathForResource:@"KSOCObjectTools" ofType:@"js"];
         NSString *string = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
@@ -365,10 +363,9 @@ static NSString *k_initJavaScriptString = nil;
     return k_initJavaScriptString;
 }
 
-static NSDictionary *k_scriptHandlers = nil;
-
-+ (NSDictionary<NSString *,KSWebViewScriptHandler *> *)scriptHandlers {
-    if (!k_scriptHandlers) {
++(NSDictionary<NSString *,KSWebViewScriptHandler *> *)scriptHandlers {
+    static NSDictionary *k_scriptHandlers = nil;
+    if (k_scriptHandlers == nil) {
         Class class = self.class;
         KSWebViewScriptHandler *importClass = [KSWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerImportClass:)];
         KSWebViewScriptHandler *invokeMethod = [KSWebViewScriptHandler scriptHandlerWithTarget:class action:@selector(scriptHandlerInvokeClassMethod:)];
@@ -376,6 +373,34 @@ static NSDictionary *k_scriptHandlers = nil;
         k_scriptHandlers = @{@"__ks_importClass": importClass, @"__ks_invokeMethod": invokeMethod, @"__ks_releaseObjects": releaseObjects};
     }
     return k_scriptHandlers;
+}
+
+-(NSMutableDictionary<NSString *, _KSOCClassInfoModel*>*)catalog {
+    if (_catalog == nil) {
+        _catalog = [NSMutableDictionary dictionary];
+    }
+    return _catalog;
+}
+
+-(NSMutableDictionary<NSString *,_KSOCObject*> *)objectPool {
+    if (_objectPool == nil) {
+        _objectPool = [NSMutableDictionary dictionary];
+    }
+    return _objectPool;
+}
+
+-(NSString *)catalogLockToken {
+    if (_catalogLockToken == nil) {
+        _catalogLockToken = [NSString stringWithFormat:@"catalogLockToken"];
+    }
+    return _catalogLockToken;
+}
+
+-(NSString *)objectPoolLockToken {
+    if (_objectPoolLockToken == nil) {
+        _objectPoolLockToken = [NSString stringWithFormat:@"objectPoolLockToken"];
+    }
+    return _objectPoolLockToken;
 }
 
 @end

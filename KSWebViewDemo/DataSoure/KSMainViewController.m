@@ -9,10 +9,6 @@
 #import "KSMainViewController.h"
 #import "KSWebDataStorageModule.h"
 
-@interface KSMainViewController ()
-
-@end
-
 @implementation KSMainViewController
 
 - (void)viewDidLoad {

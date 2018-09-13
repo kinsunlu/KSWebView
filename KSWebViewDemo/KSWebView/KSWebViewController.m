@@ -8,7 +8,7 @@
 #import "KSConstants.h"
 #import "KSWebViewController.h"
 
-@interface KSWebViewController () <WKNavigationDelegate> {
+@interface KSWebViewController ()  {
     BOOL _isTerminateWebView;
 }
 
@@ -68,29 +68,9 @@
 
 #pragma mark - WKNavigationDelegate
 
-- (void)webView:(KSWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-    
-}
-
-- (void)webView:(KSWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
-    
-}
-
-- (void)webView:(KSWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-
-}
-
 - (void)webView:(KSWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error{
     NSLog(@"error=%@",error.localizedDescription);
     [webView resetProgressView];
-}
-
-- (void)webView:(KSWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    decisionHandler(WKNavigationActionPolicyAllow);
-}
-
-- (void)webView:(KSWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
-    decisionHandler(WKNavigationResponsePolicyAllow);
 }
 
 - (void)webViewWebContentProcessDidTerminate:(KSWebView *)webView{
