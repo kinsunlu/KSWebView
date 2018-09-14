@@ -7,13 +7,7 @@
 
 #import "KSWebViewScriptHandler.h"
 
-@implementation KSWebViewScriptHandler {
-    SEL _action;
-}
-
--(SEL)action {
-    return _action;
-}
+@implementation KSWebViewScriptHandler
 
 -(instancetype)initWithTarget:(id)target action:(SEL)action {
     if (self = [super init]) {

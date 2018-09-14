@@ -1,6 +1,6 @@
 
 function __ksOCMethodTools () {}
-__ksOCMethodTools.prototype.importClass = window["__ksImportClass"];
+__ksOCMethodTools.prototype.importClass = window.__ksImportClass;
 __ksOCMethodTools.prototype.releaseObjects = function () {
 	return window.control.call("__ks_releaseObjects");
 };

@@ -22,7 +22,7 @@ NSString * const k_EstimatedProgress        = @"estimatedProgress";
 NSString * const k_WebViewTitle             = @"title";
 NSString * const k_GetVideoTag              = @"document.getElementsByTagName('video')";
 NSString * const k_WebViewBridgeIndexKey    = @"__ks_web_bridge_";
-NSString * const k_INIT_SCRIPT              = @"__ks_bridge_index = '%@';function __getKsJsBridge(){return{call:function(b,a){return prompt(window.__ks_bridge_index+b,a)}}}window.control=__getKsJsBridge()";
+NSString * const k_INIT_SCRIPT              = @"function __ksJSController__(){}__ksJSController__.prototype.call=function(b,a){return prompt('%@'+b,a);};window.control=new __ksJSController__;";
 
 NSString * const k_BlankPage                = @"about:blank";
 NSString * const k_WebViewDidAppear         = @"viewDidAppearOnApp";
