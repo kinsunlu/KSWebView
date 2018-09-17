@@ -28,6 +28,8 @@ NSString * const k_BlankPage                = @"about:blank";
 NSString * const k_WebViewDidAppear         = @"viewDidAppearOnApp";
 NSString * const k_WebViewDidDisappear      = @"viewDidDisappearOnApp";
 NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
+NSString * const k_questionMark             = @"?";
+NSString * const k_andMark                  = @"&";
 
 @interface KSWebView () <WKUIDelegate> {
     __weak UIImageView *_screenshotView;
@@ -108,13 +110,14 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
                 CGRect frame = _progressView.frame;
                 frame.size.width = self.frame.size.width*estimatedProgress;
                 __weak typeof(self) weakSelf = self;
+                __weak typeof(_progressView) weakView = _progressView;
                 [UIView animateWithDuration:0.2f animations:^{
-                    _progressView.frame = frame;
+                    weakView.frame = frame;
                 } completion:^(BOOL finished) {
                     if (estimatedProgress >= 1.f) {
                         [weakSelf resetProgressView];
                     } else {
-                        _progressView.hidden = NO;
+                        weakView.hidden = NO;
                     }
                 }];
             }
@@ -133,8 +136,8 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 
 -(void)setScriptHandlers:(NSDictionary<NSString *,KSWebViewScriptHandler*> *)scriptHandlers {
     NSArray <NSString*>*allKeys = scriptHandlers.allKeys;
-    if (allKeys.count) {
-        if (_scriptHandlers) {
+    if (allKeys.count != 0) {
+        if (_scriptHandlers != nil) {
             NSMutableDictionary <NSString*,KSWebViewScriptHandler*>*tempScriptHandlers = [NSMutableDictionary dictionaryWithDictionary:_scriptHandlers];
             [tempScriptHandlers addEntriesFromDictionary:scriptHandlers];
             _scriptHandlers = tempScriptHandlers;
@@ -160,7 +163,7 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
         KSWebViewScriptHandler *handler = [_scriptHandlers objectForKey:name];
         id target = handler.target;
         SEL action = handler.action;
-        if (target && action) {
+        if (target != nil && action != nil) {
             NSMethodSignature *signature = [target methodSignatureForSelector:action];
             const char *returnType = signature.methodReturnType;
             BOOL notHasReturnValue = !strcmp(returnType, @encode(void));
@@ -185,16 +188,16 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
             if (notHasReturnValue) return;
         } else returnValue = @"-999";
         completionHandler(returnValue);
-    } else if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    } else if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         [_UIDelegate webView:webView runJavaScriptTextInputPanelWithPrompt:prompt defaultText:body initiatedByFrame:frame completionHandler:completionHandler];
     }
 }
 
 -(void)evaluateJavaScriptMethod:(NSString*)methodName completionHandler:(void (^)(id returnValue, NSError *error))completionHandler {
-    if (methodName) {
+    if (methodName != nil) {
         NSString *javaScript = [NSString stringWithFormat:k_CallJsMethod, methodName];
         [self evaluateJavaScript:javaScript completionHandler:^(id obj, NSError * _Nullable error) {
-            if (completionHandler) {
+            if (completionHandler != nil) {
                 BOOL hasMethod = obj != nil;
                 if ([obj isKindOfClass:NSNumber.class]) {
                     hasMethod = [obj integerValue] != -999;
@@ -202,7 +205,7 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
                 if (hasMethod) {
                     completionHandler(obj, error);
                 } else {
-                    if (!error) {
+                    if (error == nil) {
                         error = [NSError errorWithDomain:@"KSJavaScriptErrorDomain" code:-999 userInfo:@{NSLocalizedDescriptionKey:@"没有找到JavaScript方法",
                                                                                                        NSLocalizedFailureReasonErrorKey:@"HTML中不包含此方法"}];
                     }
@@ -215,12 +218,12 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 
 -(void)setHtmlElementArray:(NSArray<NSString *> *)elementArray {
     _htmlElementArray = elementArray;
-    if (elementArray.count) {
+    if (elementArray.count != 0) {
         NSMutableString *elementString = [NSMutableString string];
         for (NSString *css in elementArray) {
             [elementString appendString:css];
         }
-        if (elementString.length) {
+        if (elementString.length != 0) {
             NSString *javascript = [KSWebView createElementWithJavaScript:elementString];
             WKUserScript *script = [[WKUserScript alloc] initWithSource:javascript injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
             [self.configuration.userContentController addUserScript:script];
@@ -230,11 +233,11 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 
 -(WKNavigation *)loadRequest:(NSMutableURLRequest *)request {
     //可以在此处添加请求共有自定义的Header信息
-    
-    if (_HTTPHeaders) {
-        NSArray <NSString*>*allKeys = _HTTPHeaders.allKeys;
+    NSDictionary <NSString*,NSString*>*HTTPHeaders = _HTTPHeaders;
+    if (HTTPHeaders != nil) {
+        NSArray <NSString*>*allKeys = HTTPHeaders.allKeys;
         for (NSString *key in allKeys) {
-            NSString *value = [_HTTPHeaders objectForKey:key];
+            NSString *value = [HTTPHeaders objectForKey:key];
             if (value) {
                 [request addValue:value forHTTPHeaderField:key];
             }
@@ -244,12 +247,12 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 }
 
 -(void)loadWebViewWithURL:(NSString*)url params:(NSDictionary*)params {
-    if (url.length) {
+    if (url.length != 0) {
         NSMutableString *urlString = [NSMutableString stringWithString:url];
-        if (params) {
-            NSString *bridge = @"?";
+        if (params != nil) {
+            NSString *bridge = k_questionMark;
             if ([urlString rangeOfString:bridge].location != NSNotFound) {
-                bridge = @"&";
+                bridge = k_andMark;
             }
             NSMutableString *paramsStr = [NSMutableString stringWithString:bridge];
             NSArray *allKeys = params.allKeys;
@@ -258,7 +261,7 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
                 NSString *value = [[params objectForKey:key] description];
                 [paramsStr appendFormat:@"%@=%@",key,value];
                 if (i != allKeys.count-1) {
-                    [paramsStr appendString:@"&"];
+                    [paramsStr appendString:k_andMark];
                 }
             }
             [urlString appendString:paramsStr];
@@ -271,7 +274,7 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 
 -(void)loadWebViewWithFilePath:(NSString *)filePath {
     if (filePath.length) {
-        NSString *questionMark = @"?";
+        NSString *questionMark = k_questionMark;
         NSArray <NSString*>*stringArray = [filePath componentsSeparatedByString:questionMark];
         NSURL *fileURL = nil;
         if (stringArray.count > 1) {
@@ -316,7 +319,7 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error = nil;
     NSArray *filePaths = [fileManager contentsOfDirectoryAtPath:fromRootPath error:&error];
-    if (!error) {
+    if (error == nil) {
         for (NSString *name in filePaths) {
             NSString *fromPath = [fromRootPath stringByAppendingPathComponent:name];
             NSString *toPath = [toRootPath stringByAppendingPathComponent:name];
@@ -340,27 +343,25 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
     UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
-    if (!_screenshotView) {
-        UIImageView *screenshotView = [[UIImageView alloc]init];
+    UIImageView *screenshotView = _screenshotView;
+    if (screenshotView == nil) {
+        screenshotView = [[UIImageView alloc]init];
         screenshotView.backgroundColor = [UIColor whiteColor];
         [self addSubview:screenshotView];
         _screenshotView = screenshotView;
     }
-    _screenshotView.image = img;
-    _screenshotView.frame = self.bounds;
-    _screenshotView.hidden = NO;
+    screenshotView.image = img;
+    screenshotView.frame = self.bounds;
+    screenshotView.hidden = NO;
 }
 
 -(void)webViewEndScreenshot {
-    if (_screenshotView) {
-        _screenshotView.hidden = YES;
-    }
+    UIImageView *screenshotView = _screenshotView;
+    if (screenshotView) screenshotView.hidden = YES;
 }
 
 -(void)willMoveToSuperview:(UIView *)newSuperview {
-    if (newSuperview == nil) {
-        self.scrollView.delegate = nil;
-    }
+    if (newSuperview == nil) self.scrollView.delegate = nil;
     [super willMoveToSuperview:newSuperview];
 }
 
@@ -395,22 +396,22 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 }
 
 -(void)videoPlayerCount:(void(^)(NSUInteger))callback {
-    if (callback) {
+    if (callback != nil) {
         NSString * hasVideoTestString = [NSString stringWithFormat:@"%@.length",k_GetVideoTag];
         [self evaluateJavaScript:hasVideoTestString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
-            if (callback) callback(result.unsignedIntegerValue);
+            if (callback != nil) callback(result.unsignedIntegerValue);
         }];
     }
 }
 
 -(void)videoDurationWithIndex:(NSUInteger)index callback:(void(^)(double))callback {
-    if (callback) {
+    if (callback != nil) {
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSUInteger count) {
             if (index < count) {
                 NSString * durationString = [NSString stringWithFormat:@"%@[%td].duration.toFixed(1)", k_GetVideoTag, index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
-                    if (callback) callback(result.doubleValue);
+                    if (callback != nil) callback(result.doubleValue);
                 }];
             }
         }];
@@ -418,13 +419,13 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 }
 
 -(void)videoCurrentTimeWithIndex:(NSUInteger)index callback:(void(^)(double))callback {
-    if (callback) {
+    if (callback != nil) {
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSUInteger count) {
             if (index < count) {
                 NSString * durationString = [NSString stringWithFormat:@"%@[%td].currentTime.toFixed(1)", k_GetVideoTag, index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
-                    if (callback) callback(result.doubleValue);
+                    if (callback != nil) callback(result.doubleValue);
                 }];
             }
         }];
@@ -455,33 +456,33 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 
 -(KSWebView *)webView:(KSWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
     KSWebView *value = nil;
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         value = (KSWebView*)[_UIDelegate webView:webView createWebViewWithConfiguration:configuration forNavigationAction:navigationAction windowFeatures:windowFeatures];
     }
     return value;
 }
 
 -(void)webViewDidClose:(KSWebView *)webView {
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         [_UIDelegate webViewDidClose:webView];
     }
 }
 
 -(void)webView:(KSWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler {
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         [_UIDelegate webView:webView runJavaScriptAlertPanelWithMessage:message initiatedByFrame:frame completionHandler:completionHandler];
     }
 }
 
 -(void)webView:(KSWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL result))completionHandler {
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         [_UIDelegate webView:webView runJavaScriptConfirmPanelWithMessage:message initiatedByFrame:frame completionHandler:completionHandler];
     }
 }
 
 -(BOOL)webView:(KSWebView *)webView shouldPreviewElement:(WKPreviewElementInfo *)elementInfo {
     BOOL result = NO;
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         result = [_UIDelegate webView:webView shouldPreviewElement:elementInfo];
     }
     return result;
@@ -489,14 +490,14 @@ NSString * const k_CallJsMethod             = @"javascript:callJsMethod('%@')";
 
 -(UIViewController *)webView:(KSWebView *)webView previewingViewControllerForElement:(WKPreviewElementInfo *)elementInfo defaultActions:(NSArray<id <WKPreviewActionItem>> *)previewActions {
     UIViewController *controller = nil;
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         controller = [_UIDelegate webView:webView previewingViewControllerForElement:elementInfo defaultActions:previewActions];
     }
     return controller;
 }
 
 -(void)webView:(KSWebView *)webView commitPreviewingViewController:(UIViewController *)previewingViewController {
-    if (_UIDelegate && [_UIDelegate respondsToSelector:_cmd]) {
+    if (_UIDelegate != nil && [_UIDelegate respondsToSelector:_cmd]) {
         [_UIDelegate webView:webView commitPreviewingViewController:previewingViewController];
     }
 }

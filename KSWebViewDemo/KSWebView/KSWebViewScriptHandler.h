@@ -10,7 +10,7 @@
 @interface KSWebViewScriptHandler : NSObject
 
 @property (nonatomic, weak, readonly) id target;
-@property (nonatomic, readonly) SEL action;
+@property (readonly) SEL action;
 
 +(instancetype)scriptHandlerWithTarget:(id)target action:(SEL)action;
 -(instancetype)initWithTarget:(id)target action:(SEL)action;

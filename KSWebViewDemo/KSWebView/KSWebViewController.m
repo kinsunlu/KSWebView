@@ -29,35 +29,35 @@
     [webView evaluateJavaScriptMethod:k_WebViewDidDisappear completionHandler:nil];
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+-(void)loadView {
+    [super loadView];
     _isTerminateWebView = NO;
-    
-    self.title = @"正在加载...";
-    
-    KSWebView *webView = [KSWebView safelyReleaseWebViewWithFrame:CGRectZero delegate:self];
+    KSWebView *webView = [self loadWebView];
     __weak typeof(self) weakSelf = self;
     [webView setWebViewTitleChangedCallback:^(NSString *title) {
-        if (title.length) {
+        if (title.length != 0) {
             weakSelf.title = title;
         }
     }];
-    [self layoutWebView:webView];
     _webView = webView;
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
--(void)layoutWebView:(KSWebView *)webView {
-    UIView *view = self.view;
-    webView.frame = view.bounds;
-    [view addSubview:webView];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"正在加载...";
 }
 
--(void)loadWebView {
-    if (_url.length) {
+-(KSWebView*)loadWebView {
+    KSWebView *webView = [KSWebView safelyReleaseWebViewWithFrame:self.view.frame delegate:self];
+    self.view = webView;
+    return webView;
+}
+
+-(void)startWebViewRequest {
+    if (_url.length != 0) {
         [_webView loadWebViewWithURL:_url params:_params];
-    } else if (_filePath.length) {
+    } else if (_filePath.length != 0) {
         [_webView loadWebViewWithFilePath:_filePath];
     }
 }

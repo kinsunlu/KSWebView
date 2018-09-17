@@ -15,9 +15,10 @@
 @property (nonatomic, copy) NSString *url;
 @property (nonatomic, strong) NSDictionary *params;
 
--(void)loadWebView;//继承后手动调用
-//初始化时调用布局继承后可不用调用super layoutWebview: 方法,默认全屏
--(void)layoutWebView:(KSWebView *)webView;
+//初始化时调用布局KSWebView,默认全屏(self.view = webView)
+-(KSWebView*)loadWebView;
+//开始WebView请求，继承后手动调用
+-(void)startWebViewRequest;
 
 //页面加载失败之后调用//此方法中有实现需执行super方法
 - (void)webView:(KSWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error;

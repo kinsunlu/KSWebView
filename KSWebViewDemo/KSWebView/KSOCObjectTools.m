@@ -12,7 +12,7 @@
 
 @interface _KSOCMethodModel : NSObject
 
-@property (nonatomic, assign, readonly) SEL selector;
+@property (nonatomic, readonly) SEL selector;
 @property (nonatomic, copy, readonly) NSString *selectorString;
 @property (nonatomic, assign, readonly, getter=isClassMethod) BOOL classMethod;
 
@@ -59,6 +59,14 @@
 -(void)dealloc {
     _objectValue = nil;
     _locationValue = NULL;
+}
+
+-(NSString *)description {
+    if (_isObject) {
+        return [_objectValue description];
+    } else {
+        return [NSString stringWithFormat:@"%p", _locationValue];
+    }
 }
 
 @end
@@ -114,9 +122,9 @@ NSString * const k_ulonglong        = @"ulonglong";
 
 @interface KSOCObjectTools ()
 
-@property (nonatomic, strong, readonly) NSMutableDictionary <NSString *, _KSOCClassInfoModel*>*catalog;
+@property (nonatomic, strong, readonly) NSMapTable <NSString *, _KSOCClassInfoModel*>*catalog;
 @property (nonatomic, readonly, copy) NSString *catalogLockToken;
-@property (nonatomic, strong, readonly) NSMutableDictionary <NSString *, _KSOCObject*>*objectPool;
+@property (nonatomic, strong, readonly) NSMapTable <NSString *, _KSOCObject*>*objectPool;
 @property (nonatomic, readonly, copy) NSString *objectPoolLockToken;
 
 @end
@@ -142,13 +150,13 @@ static KSOCObjectTools *_instance = nil;
         Class class = NSClassFromString(body);
         if (class != nil) {
             KSOCObjectTools *tools = [KSOCObjectTools share];
-            NSMutableDictionary <NSString *,_KSOCClassInfoModel*>*catalog = tools.catalog;
+            NSMapTable <NSString *,_KSOCClassInfoModel*>*catalog = tools.catalog;
             NSMutableArray <NSString*>* classMethodNameArray = [NSMutableArray array];
             NSMutableArray <NSString*>* instanceMethodNameArray = [NSMutableArray array];
             while (class != nil) {
                 NSString *classNameKey = NSStringFromClass(class);
                 _KSOCClassInfoModel *info = [catalog objectForKey:classNameKey];
-                if (!info) {
+                if (info == nil) {
                     info = [self methodFromClass:class];
                     @synchronized (tools.catalogLockToken) {
                         [catalog setObject:info forKey:classNameKey];
@@ -199,17 +207,17 @@ static KSOCObjectTools *_instance = nil;
         NSString *className = model.className;
         NSString *objKey = model.objKey;
         KSOCObjectTools *tools = [KSOCObjectTools share];
-        NSMutableDictionary <NSString *, _KSOCObject*>*objectPool = tools.objectPool;
+        NSMapTable <NSString *, _KSOCObject*>*objectPool = tools.objectPool;
         SEL selector = nil;
         id target = nil;
         NSMethodSignature *signature = nil;
-        if (className.length != 0) {
+        if (className != nil && className.length != 0) {
             Class class = NSClassFromString(model.className);
             _KSOCMethodModel *obj_model = [self searchClass:class isClass:YES method:funcName inCatalog:tools.catalog];
             selector = obj_model.selector;
             signature = [class methodSignatureForSelector:selector];
             target = class;
-        } else if (objKey.length != 0) {
+        } else if (objKey != nil && objKey.length != 0) {
             _KSOCObject *obj = [objectPool objectForKey:objKey];
             target = obj.objectValue;
             Class class = [target class];
@@ -272,14 +280,14 @@ static KSOCObjectTools *_instance = nil;
                 if (paramLocation == NULL) paramLocation = &param;
                 [invocation setArgument:paramLocation atIndex:i+2];
             }
-            [invocation retainArguments];
             [invocation invokeWithTarget:target];
             const char *returnType = signature.methodReturnType;
             if (strcmp(returnType, @encode(void))) {
                 NSDictionary *returnData = nil;
                 if (!strcmp(returnType, @encode(id))) {
-                    __unsafe_unretained id returnValue = nil;
-                    [invocation getReturnValue:&returnValue];
+                    void *temp;
+                    [invocation getReturnValue:&temp];
+                    id returnValue = (__bridge id)temp;
                     if ([returnValue isKindOfClass:NSString.class]) {
                         returnData = @{k_type: k_string, k_value: returnValue};
                     } else {
@@ -339,7 +347,7 @@ static KSOCObjectTools *_instance = nil;
     return nil;
 }
 
-+(_KSOCMethodModel*)searchClass:(Class)class isClass:(BOOL)isclass method:(NSString*)methodString inCatalog:(NSDictionary <NSString *, _KSOCClassInfoModel*>*)catalog {
++(_KSOCMethodModel*)searchClass:(Class)class isClass:(BOOL)isclass method:(NSString*)methodString inCatalog:(NSMapTable <NSString *, _KSOCClassInfoModel*>*)catalog {
     _KSOCClassInfoModel *info = [catalog objectForKey:NSStringFromClass(class)];
     _KSOCMethodModel *model = isclass ? [info.classMethod objectForKey:methodString] : [info.instanceMethod objectForKey:methodString];
     if (model != nil) {
@@ -350,7 +358,10 @@ static KSOCObjectTools *_instance = nil;
 }
 
 +(void)releaseObjects {
-    [[KSOCObjectTools share].objectPool removeAllObjects];
+    KSOCObjectTools *tools = [KSOCObjectTools share];
+    @synchronized (tools.objectPoolLockToken) {
+        [tools.objectPool removeAllObjects];
+    }
 }
 
 +(NSString *)initJavaScriptString {
@@ -375,16 +386,16 @@ static KSOCObjectTools *_instance = nil;
     return k_scriptHandlers;
 }
 
--(NSMutableDictionary<NSString *, _KSOCClassInfoModel*>*)catalog {
+-(NSMapTable<NSString *, _KSOCClassInfoModel*>*)catalog {
     if (_catalog == nil) {
-        _catalog = [NSMutableDictionary dictionary];
+        _catalog = [NSMapTable strongToStrongObjectsMapTable];
     }
     return _catalog;
 }
 
--(NSMutableDictionary<NSString *,_KSOCObject*> *)objectPool {
+-(NSMapTable<NSString *,_KSOCObject*> *)objectPool {
     if (_objectPool == nil) {
-        _objectPool = [NSMutableDictionary dictionary];
+        _objectPool = [NSMapTable strongToStrongObjectsMapTable];
     }
     return _objectPool;
 }
