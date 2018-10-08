@@ -127,13 +127,6 @@
 			path = KSWebView;
 			sourceTree = "<group>";
 		};
-		6D549254216B55C5002AB70D /* DataSoure */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = DataSoure;
-			sourceTree = "<group>";
-		};
 		6DE43E942015EAB6006F6457 = {
 			isa = PBXGroup;
 			children = (
@@ -161,7 +154,6 @@
 				6D549257216B55C5002AB70D /* AppDelegate.h */,
 				6D54925B216B55C5002AB70D /* AppDelegate.m */,
 				6D549253216B55C5002AB70D /* Assets.xcassets */,
-				6D549254216B55C5002AB70D /* DataSoure */,
 				6D549256216B55C5002AB70D /* demo-info.plist */,
 				6D549255216B55C5002AB70D /* KSJSTestController.m */,
 				6D54925C216B55C5002AB70D /* KSMainViewController.h */,
