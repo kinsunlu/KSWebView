@@ -1,5 +1,8 @@
 # 欢迎使用 KSWebView
 
+pod 安装方式：
+pod 'KSWebView'
+
 如有问题欢迎加入QQ群：700276016
 
 ------

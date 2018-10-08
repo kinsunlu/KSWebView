@@ -6,6 +6,7 @@ xcuserdata
 *.pbxuser
 *.xcuserstate
 *.xcsettings
+*.podspec
 
 # CocoaPods
 *.xcworkspace

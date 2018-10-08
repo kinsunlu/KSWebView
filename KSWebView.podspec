@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KSWebView"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "KSWebView Powerful WKWebView successors"
 
   s.description  = "KSWebView Powerful WKWebView successors"
