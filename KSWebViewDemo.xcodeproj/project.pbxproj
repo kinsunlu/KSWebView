@@ -11,17 +11,7 @@
 		6D23174F213542E90095BEB7 /* KSOCObjectTools.js in Resources */ = {isa = PBXBuildFile; fileRef = 6D23174E213542E90095BEB7 /* KSOCObjectTools.js */; };
 		6D405EB221339D190029187D /* KSOCObjectTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D405EB121339D190029187D /* KSOCObjectTools.m */; };
 		6DA040AD2019C73C003DB6A3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6DA040AC2019C73C003DB6A3 /* README.md */; };
-		6DC95296214A0BFE0055E3C4 /* KSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9527E214A0BFE0055E3C4 /* KSModel.m */; };
-		6DC95297214A0BFE0055E3C4 /* MJPropertyType.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC95283214A0BFE0055E3C4 /* MJPropertyType.m */; };
-		6DC95298214A0BFE0055E3C4 /* NSObject+MJKeyValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC95286214A0BFE0055E3C4 /* NSObject+MJKeyValue.m */; };
-		6DC95299214A0BFE0055E3C4 /* MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC95287214A0BFE0055E3C4 /* MJProperty.m */; };
-		6DC9529A214A0BFE0055E3C4 /* NSObject+MJCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC95289214A0BFE0055E3C4 /* NSObject+MJCoding.m */; };
-		6DC9529B214A0BFE0055E3C4 /* MJExtensionConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9528B214A0BFE0055E3C4 /* MJExtensionConst.m */; };
-		6DC9529C214A0BFE0055E3C4 /* NSObject+MJProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9528C214A0BFE0055E3C4 /* NSObject+MJProperty.m */; };
-		6DC9529D214A0BFE0055E3C4 /* NSObject+MJClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9528E214A0BFE0055E3C4 /* NSObject+MJClass.m */; };
-		6DC9529E214A0BFE0055E3C4 /* NSString+MJExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC9528F214A0BFE0055E3C4 /* NSString+MJExtension.m */; };
-		6DC9529F214A0BFE0055E3C4 /* MJPropertyKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC95290214A0BFE0055E3C4 /* MJPropertyKey.m */; };
-		6DC952A0214A0BFE0055E3C4 /* MJFoundation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DC95294214A0BFE0055E3C4 /* MJFoundation.m */; };
+		6DDDD742216B249000D48D18 /* KSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DDDD741216B249000D48D18 /* KSModel.m */; };
 		6DE43EA22015EAB6006F6457 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EA12015EAB6006F6457 /* AppDelegate.m */; };
 		6DE43EAA2015EAB6006F6457 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DE43EA92015EAB6006F6457 /* Assets.xcassets */; };
 		6DE43EB02015EAB6006F6457 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EAF2015EAB6006F6457 /* main.m */; };
@@ -32,6 +22,7 @@
 		6DE43ECC2015EBCA006F6457 /* KSWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43EC52015EBCA006F6457 /* KSWebViewController.m */; };
 		6DE43F442015FF90006F6457 /* KSMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE43F432015FF90006F6457 /* KSMainViewController.m */; };
 		6DE4EE1F21368E150072CE02 /* KSJSTestController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DE4EE1E21368E150072CE02 /* KSJSTestController.m */; };
+		8BA8FC46B087EAC758C73FE3 /* libPods-KSWebViewDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF083DCBEAFB8D40DE3EEC14 /* libPods-KSWebViewDemo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,29 +31,8 @@
 		6D405EB021339D190029187D /* KSOCObjectTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSOCObjectTools.h; sourceTree = "<group>"; };
 		6D405EB121339D190029187D /* KSOCObjectTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSOCObjectTools.m; sourceTree = "<group>"; };
 		6DA040AC2019C73C003DB6A3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		6DC9527E214A0BFE0055E3C4 /* KSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSModel.m; sourceTree = "<group>"; };
-		6DC95280214A0BFE0055E3C4 /* MJPropertyKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJPropertyKey.h; sourceTree = "<group>"; };
-		6DC95281214A0BFE0055E3C4 /* NSObject+MJClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJClass.h"; sourceTree = "<group>"; };
-		6DC95282214A0BFE0055E3C4 /* NSString+MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MJExtension.h"; sourceTree = "<group>"; };
-		6DC95283214A0BFE0055E3C4 /* MJPropertyType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJPropertyType.m; sourceTree = "<group>"; };
-		6DC95284214A0BFE0055E3C4 /* NSObject+MJProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJProperty.h"; sourceTree = "<group>"; };
-		6DC95285214A0BFE0055E3C4 /* MJExtensionConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJExtensionConst.h; sourceTree = "<group>"; };
-		6DC95286214A0BFE0055E3C4 /* NSObject+MJKeyValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJKeyValue.m"; sourceTree = "<group>"; };
-		6DC95287214A0BFE0055E3C4 /* MJProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJProperty.m; sourceTree = "<group>"; };
-		6DC95288214A0BFE0055E3C4 /* MJFoundation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJFoundation.h; sourceTree = "<group>"; };
-		6DC95289214A0BFE0055E3C4 /* NSObject+MJCoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJCoding.m"; sourceTree = "<group>"; };
-		6DC9528A214A0BFE0055E3C4 /* MJExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJExtension.h; sourceTree = "<group>"; };
-		6DC9528B214A0BFE0055E3C4 /* MJExtensionConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJExtensionConst.m; sourceTree = "<group>"; };
-		6DC9528C214A0BFE0055E3C4 /* NSObject+MJProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJProperty.m"; sourceTree = "<group>"; };
-		6DC9528D214A0BFE0055E3C4 /* MJPropertyType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJPropertyType.h; sourceTree = "<group>"; };
-		6DC9528E214A0BFE0055E3C4 /* NSObject+MJClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+MJClass.m"; sourceTree = "<group>"; };
-		6DC9528F214A0BFE0055E3C4 /* NSString+MJExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MJExtension.m"; sourceTree = "<group>"; };
-		6DC95290214A0BFE0055E3C4 /* MJPropertyKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJPropertyKey.m; sourceTree = "<group>"; };
-		6DC95291214A0BFE0055E3C4 /* MJProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJProperty.h; sourceTree = "<group>"; };
-		6DC95292214A0BFE0055E3C4 /* NSObject+MJKeyValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJKeyValue.h"; sourceTree = "<group>"; };
-		6DC95293214A0BFE0055E3C4 /* NSObject+MJCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+MJCoding.h"; sourceTree = "<group>"; };
-		6DC95294214A0BFE0055E3C4 /* MJFoundation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJFoundation.m; sourceTree = "<group>"; };
-		6DC95295214A0BFE0055E3C4 /* KSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSModel.h; sourceTree = "<group>"; };
+		6DDDD740216B249000D48D18 /* KSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSModel.h; sourceTree = "<group>"; };
+		6DDDD741216B249000D48D18 /* KSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSModel.m; sourceTree = "<group>"; };
 		6DE43E9D2015EAB6006F6457 /* KSWebViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KSWebViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DE43EA02015EAB6006F6457 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6DE43EA12015EAB6006F6457 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -83,6 +53,9 @@
 		6DE43F422015FF90006F6457 /* KSMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSMainViewController.h; sourceTree = "<group>"; };
 		6DE43F432015FF90006F6457 /* KSMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSMainViewController.m; sourceTree = "<group>"; };
 		6DE4EE1E21368E150072CE02 /* KSJSTestController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSJSTestController.m; sourceTree = "<group>"; };
+		A302F631D07058E35CCC474D /* Pods-KSWebViewDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KSWebViewDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-KSWebViewDemo/Pods-KSWebViewDemo.release.xcconfig"; sourceTree = "<group>"; };
+		EF083DCBEAFB8D40DE3EEC14 /* libPods-KSWebViewDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KSWebViewDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4D8A7387B1D59707FC66F97 /* Pods-KSWebViewDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KSWebViewDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KSWebViewDemo/Pods-KSWebViewDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,48 +63,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BA8FC46B087EAC758C73FE3 /* libPods-KSWebViewDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6DC9527D214A0BFE0055E3C4 /* KSModel */ = {
+		24D3C303C2283E430C4C457E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6DC95295214A0BFE0055E3C4 /* KSModel.h */,
-				6DC9527E214A0BFE0055E3C4 /* KSModel.m */,
-				6DC9527F214A0BFE0055E3C4 /* MJExtension */,
+				EF083DCBEAFB8D40DE3EEC14 /* libPods-KSWebViewDemo.a */,
 			);
-			path = KSModel;
-			sourceTree = "<group>";
-		};
-		6DC9527F214A0BFE0055E3C4 /* MJExtension */ = {
-			isa = PBXGroup;
-			children = (
-				6DC9528A214A0BFE0055E3C4 /* MJExtension.h */,
-				6DC95285214A0BFE0055E3C4 /* MJExtensionConst.h */,
-				6DC9528B214A0BFE0055E3C4 /* MJExtensionConst.m */,
-				6DC95288214A0BFE0055E3C4 /* MJFoundation.h */,
-				6DC95294214A0BFE0055E3C4 /* MJFoundation.m */,
-				6DC95291214A0BFE0055E3C4 /* MJProperty.h */,
-				6DC95287214A0BFE0055E3C4 /* MJProperty.m */,
-				6DC95280214A0BFE0055E3C4 /* MJPropertyKey.h */,
-				6DC95290214A0BFE0055E3C4 /* MJPropertyKey.m */,
-				6DC9528D214A0BFE0055E3C4 /* MJPropertyType.h */,
-				6DC95283214A0BFE0055E3C4 /* MJPropertyType.m */,
-				6DC95281214A0BFE0055E3C4 /* NSObject+MJClass.h */,
-				6DC9528E214A0BFE0055E3C4 /* NSObject+MJClass.m */,
-				6DC95293214A0BFE0055E3C4 /* NSObject+MJCoding.h */,
-				6DC95289214A0BFE0055E3C4 /* NSObject+MJCoding.m */,
-				6DC95292214A0BFE0055E3C4 /* NSObject+MJKeyValue.h */,
-				6DC95286214A0BFE0055E3C4 /* NSObject+MJKeyValue.m */,
-				6DC95284214A0BFE0055E3C4 /* NSObject+MJProperty.h */,
-				6DC9528C214A0BFE0055E3C4 /* NSObject+MJProperty.m */,
-				6DC95282214A0BFE0055E3C4 /* NSString+MJExtension.h */,
-				6DC9528F214A0BFE0055E3C4 /* NSString+MJExtension.m */,
-			);
-			path = MJExtension;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		6DE43E942015EAB6006F6457 = {
@@ -140,6 +84,8 @@
 				6DA040AC2019C73C003DB6A3 /* README.md */,
 				6DE43E9F2015EAB6006F6457 /* KSWebViewDemo */,
 				6DE43E9E2015EAB6006F6457 /* Products */,
+				FB6819E1BD80D7E26B3CF16E /* Pods */,
+				24D3C303C2283E430C4C457E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -154,7 +100,6 @@
 		6DE43E9F2015EAB6006F6457 /* KSWebViewDemo */ = {
 			isa = PBXGroup;
 			children = (
-				6DC9527D214A0BFE0055E3C4 /* KSModel */,
 				6DE43EB72015EBCA006F6457 /* KSWebView */,
 				6DE43EB62015EAE7006F6457 /* DataSoure */,
 			);
@@ -194,8 +139,19 @@
 				6DE43EBC2015EBCA006F6457 /* KSWebViewMemoryManager.m */,
 				6DE43EC32015EBCA006F6457 /* KSWebViewScriptHandler.h */,
 				6DE43EBD2015EBCA006F6457 /* KSWebViewScriptHandler.m */,
+				6DDDD740216B249000D48D18 /* KSModel.h */,
+				6DDDD741216B249000D48D18 /* KSModel.m */,
 			);
 			path = KSWebView;
+			sourceTree = "<group>";
+		};
+		FB6819E1BD80D7E26B3CF16E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F4D8A7387B1D59707FC66F97 /* Pods-KSWebViewDemo.debug.xcconfig */,
+				A302F631D07058E35CCC474D /* Pods-KSWebViewDemo.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -205,6 +161,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6DE43EB32015EAB6006F6457 /* Build configuration list for PBXNativeTarget "KSWebViewDemo" */;
 			buildPhases = (
+				2C0CA5E3B227175A2BDC1EE8 /* [CP] Check Pods Manifest.lock */,
 				6DE43E992015EAB6006F6457 /* Sources */,
 				6DE43E9A2015EAB6006F6457 /* Frameworks */,
 				6DE43E9B2015EAB6006F6457 /* Resources */,
@@ -265,32 +222,47 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2C0CA5E3B227175A2BDC1EE8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KSWebViewDemo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		6DE43E992015EAB6006F6457 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				6DE4EE1F21368E150072CE02 /* KSJSTestController.m in Sources */,
-				6DC95296214A0BFE0055E3C4 /* KSModel.m in Sources */,
-				6DC95298214A0BFE0055E3C4 /* NSObject+MJKeyValue.m in Sources */,
+				6DDDD742216B249000D48D18 /* KSModel.m in Sources */,
 				6DE43EB02015EAB6006F6457 /* main.m in Sources */,
 				6DE43ECC2015EBCA006F6457 /* KSWebViewController.m in Sources */,
-				6DC9529E214A0BFE0055E3C4 /* NSString+MJExtension.m in Sources */,
 				6DE43EC82015EBCA006F6457 /* KSWebViewMemoryManager.m in Sources */,
-				6DC9529F214A0BFE0055E3C4 /* MJPropertyKey.m in Sources */,
 				6DE43F442015FF90006F6457 /* KSMainViewController.m in Sources */,
 				6DE43EC72015EBCA006F6457 /* KSWebView.m in Sources */,
-				6DC9529B214A0BFE0055E3C4 /* MJExtensionConst.m in Sources */,
-				6DC9529D214A0BFE0055E3C4 /* NSObject+MJClass.m in Sources */,
 				6DE43EC92015EBCA006F6457 /* KSWebViewScriptHandler.m in Sources */,
-				6DC95299214A0BFE0055E3C4 /* MJProperty.m in Sources */,
 				6DE43EA22015EAB6006F6457 /* AppDelegate.m in Sources */,
-				6DC952A0214A0BFE0055E3C4 /* MJFoundation.m in Sources */,
-				6DC95297214A0BFE0055E3C4 /* MJPropertyType.m in Sources */,
-				6DC9529C214A0BFE0055E3C4 /* NSObject+MJProperty.m in Sources */,
 				6D405EB221339D190029187D /* KSOCObjectTools.m in Sources */,
 				6DE43ECB2015EBCA006F6457 /* KSWebDataStorageModule.m in Sources */,
-				6DC9529A214A0BFE0055E3C4 /* NSObject+MJCoding.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,32 +379,38 @@
 		};
 		6DE43EB42015EAB6006F6457 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F4D8A7387B1D59707FC66F97 /* Pods-KSWebViewDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 83A69SJBUG;
+				DEVELOPMENT_TEAM = F4YZH76AUW;
 				INFOPLIST_FILE = KSWebViewDemo/DataSoure/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = kinsun.kswebview.demo;
+				PRODUCT_BUNDLE_IDENTIFIER = kinsun.kswebview.demo1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		6DE43EB52015EAB6006F6457 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A302F631D07058E35CCC474D /* Pods-KSWebViewDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 83A69SJBUG;
+				DEVELOPMENT_TEAM = F4YZH76AUW;
 				INFOPLIST_FILE = KSWebViewDemo/DataSoure/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = kinsun.kswebview.demo;
+				PRODUCT_BUNDLE_IDENTIFIER = kinsun.kswebview.demo1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

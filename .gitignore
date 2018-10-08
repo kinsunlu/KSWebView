@@ -1,0 +1,12 @@
+# ios
+*.DS_Store
+Build
+xcuserdata
+*.perspectivev3
+*.pbxuser
+*.xcuserstate
+*.xcsettings
+
+# CocoaPods
+*.xcworkspace
+Pods
