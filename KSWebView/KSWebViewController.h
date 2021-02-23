@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KSWebViewController : UIViewController <WKNavigationDelegate> //更改为自己的基类最佳
 
 @property (nonatomic, strong) KSWebView *view;
-@property (nonatomic, copy) NSString *filePath;
-@property (nonatomic, copy) NSString *url;
-@property (nonatomic, strong) NSDictionary *params;
+@property (nonatomic, copy, nullable) NSString *filePath;
+@property (nonatomic, copy, nullable) NSString *url;
+@property (nonatomic, strong, nullable) NSDictionary *params;
 
 /// 初始化时调用布局KSWebView,默认全屏(self.view = webView)
 - (KSWebView *)loadWebView;

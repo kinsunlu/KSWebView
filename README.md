@@ -103,8 +103,9 @@ var data = {
 //将JS对象转换为NSDictionary
 var NSDictionary = window.OCTools.importClass("NSDictionary");
 var dict = NSDictionary.dictionaryWithDictionary(data);
+var KSHelper = window.OCTools.importClass("KSHelper");
 //将NSDictionary转换为JS对象
-var jsonString = dict.mj_JSONString();
+var jsonString = KSHelper.jsonWithObject(dict);
 var jsObject = JSON.parse(jsonString);
 window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 ```
@@ -114,8 +115,9 @@ var data = ["NO.1", "NO.2", "NO.3", "NO.4"];
 //将JS对象转换为NSDictionary
 var NSArray = window.OCTools.importClass("NSArray");
 var arr = NSArray.arrayWithArray(data);
+var KSHelper = window.OCTools.importClass("KSHelper");
 //将NSDictionary转换为JS对象
-var jsonString = arr.mj_JSONString();
+var jsonString = KSHelper.jsonWithObject(arr);
 var jsArray = JSON.parse(jsonString);
 window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
 ```
