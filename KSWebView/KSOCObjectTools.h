@@ -9,6 +9,11 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
+FOUNDATION_EXTERN size_t __ks_lengthFromType(const char *type);
+FOUNDATION_EXTERN NSNumber *_Nullable __ks_numberFromInvocation(NSInvocation *invocation, size_t length, const char *type);
+
 @class KSWebViewScriptHandler;
 @interface KSOCObjectTools : NSObject
 
@@ -16,3 +21,5 @@
 @property (nonatomic, readonly, class) NSDictionary <NSString*, KSWebViewScriptHandler*>*scriptHandlers;
 
 @end
+
+NS_ASSUME_NONNULL_END

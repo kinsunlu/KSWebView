@@ -1,153 +1,129 @@
 <html>
-    <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=contain">
-<meta content="yes" name="apple-mobile-web-app-capable">
-<meta content="black" name="apple-mobile-web-app-status-bar-style">
-<meta content="telephone=no" name="format-detection">
-<meta content="email=no" name="format-detection">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, viewport-fit=contain">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
     <title>KSWebViewDemo</title>
     <style>
         div {
-            display:block;
-            font-size:10px;
+            display: block;
+            font-size: 10px;
         }
+
         input {
-            display:block;
-            margin-top:10px;
-            width:100%;
-            height:30px;
-            font-size:10px;
+            display: block;
+            margin-top: 10px;
+            width: 100%;
+            height: 30px;
+            font-size: 10px;
         }
-    button {
-        margin-top:10px;
-        width:100%;
-        height:30px;
-        background:#eb2547;
-        font-size:10px;
-        color:#ffffff;
-    }
+
+        button {
+            margin-top: 10px;
+            width: 100%;
+            height: 30px;
+            background: #eb2547;
+            font-size: 10px;
+            color: #ffffff;
+        }
     </style>
-    </head>
-    <body>
-        <div id="label"></div>
-        <div id="label1"></div>
-        <div id="label2"></div>
-        <button onclick="testJS(this)">测试JS调用原生</button>
-        <button onclick="testGetReturn(this)">测试JS调用原生后拿返回值</button>
-        <button onclick="openNewPage(this)">打开一个新页面</button>
-        <input type="text" id='settingValueInput' value='18'></input>
-        <button onclick="setValue(this)">上面输入的值设置给key为token的储存空间</button>
-        <button onclick="getValue(this)">获取储存中key为token的值</button>
-        <button onclick="addObserver(this)">监听token的值变化回调给JS的observerCallback方法</button>
-        <button onclick="removeObserver(this)">移除对token的监听</button>
-        <button onclick="removeCurrentObserver(this)">移除对当前所有的监听</button>
-        <button onclick="reInit(this)">初始化数据储存模块中的数据但不移除监听(慎用)</button>
-        <button onclick="importClass(this)">测试JS映射OC对象(调用)</button>
-    </body>
+</head>
+
+<body>
+    <div id="label"></div>
+    <div id="label1"></div>
+    <div id="label2"></div>
+    <button onclick="testJS(this)">测试JS调用原生</button>
+    <button onclick="testGetReturn(this)">测试JS调用原生后拿返回值</button>
+    <button onclick="openNewPage(this)">打开一个新页面</button>
+    <input type="text" id='settingValueInput' value='18'></input>
+    <button onclick="setValue(this)">上面输入的值设置给key为token的储存空间</button>
+    <button onclick="getValue(this)">获取储存中key为token的值</button>
+    <button onclick="addObserver(this)">监听token的值变化回调给JS的observerCallback方法</button>
+    <button onclick="removeObserver(this)">移除对token的监听</button>
+    <button onclick="removeCurrentObserver(this)">移除对当前所有的监听</button>
+    <button onclick="reInit(this)">初始化数据储存模块中的数据但不移除监听(慎用)</button>
+    <button onclick="importClass(this)">测试JS映射OC对象(调用)</button>
+</body>
+
 </html>
 <script>
     function testJS(obj) {
-        window.control.call('testJSCallback');
+        window.android.testJSCallback();
     }
 
-function testGetReturn(obj) {
-    var returnValue = window.control.call('testReturnValue');
-    window.control.call('alert',returnValue);
-}
-
-function openNewPage(obj) {
-    window.control.call('openNewPage');
-}
-
-function setValue(obj) {
-    var value = document.getElementById('settingValueInput').value;
-    var json = {
-        'token': value
+    function testGetReturn(obj) {
+        var returnValue = window.android.testReturnValue();
+        window.android.alert(returnValue);
     }
-    window.control.call('setValue',JSON.stringify(json));
-}
 
-function getValue(obj) {
-    var value = window.control.call('getValue','token');
-    window.control.call('alert',value);
-}
-
-function addObserver(obj) {
-    var json = {
-        'token': 'observerCallback'
+    function openNewPage(obj) {
+        window.android.openNewPage();
     }
-    window.control.call('addObserver',JSON.stringify(json));
-}
 
-function removeObserver(obj) {
-    window.control.call('removeObserver','token');
-}
-
-function removeCurrentObserver(obj) {
-    window.control.call('removeCurrentObserver');
-}
-
-function reInit(obj) {
-    window.control.call('reInit');
-}
-
-function observerCallback(params) {//监听token时定义的方法
-    var value = params[0];
-    var oldValue = params[1];
-    var desc = 'token的值发生了变化,变化为'+value;
-    if (oldValue) {
-        desc += ',变化前的值为'+oldValue;
+    function setValue(obj) {
+        var value = document.getElementById('settingValueInput').value;
+        window.android.setValue(value, 'token');
     }
-    var logString = 'observerCallback被调用.'+desc;
-    document.getElementById("label").innerText = logString;
-}
 
-function viewDidAppearOnApp(params) {//无需注册,当前页面显示时调用
-    document.getElementById("label1").innerText = '当前网页已经在App屏幕中了';
-}
+    function getValue(obj) {
+        var value = window.android.getValue('token');
+        window.alert(value);
+    }
 
-function viewDidDisappearOnApp(params) {//无需注册,当前页面消失时调用
-    document.getElementById("label2").innerText = '当前网页已经不在App屏幕中了';
-}
+    function addObserver(obj) {
+        window.android.addObserver('token', 'observerCallback');
+    }
 
-function callJsMethod(method) {//app所有调用JS的方法都会在此分发
-    if(typeof window[method] === 'function'){
-        try {
-            var result;
-            var params = Array.prototype.slice.call(arguments);
-            if (params.length) {
-                params = params.slice(1);
-                result = window[method](params);
-                return result;
-            } else {
-                result = window[method]();
-                return result;
-            }
-        } catch (e) {
-            return -999;
+    function removeObserver(obj) {
+        window.android.removeObserver('token');
+    }
+
+    function removeCurrentObserver(obj) {
+        window.android.removeAllObserver();
+    }
+
+    function reInit(obj) {
+        window.android.reinit();
+    }
+
+    function observerCallback(value, oldValue) {//监听token时定义的方法
+        var desc = 'token的值发生了变化,变化为' + value;
+        if (oldValue) {
+            desc += ',变化前的值为' + oldValue;
         }
-    } else {
-        return -999;
+        var logString = 'observerCallback被调用.' + desc;
+        document.getElementById("label").innerText = logString;
     }
-}
 
-function importClass(className) {
-	//先导入要用到的OC类
-	var tools = window.OCTools;
-	var KSJSTestController = tools.importClass("KSJSTestController");
-	var UIApplication = tools.importClass("UIApplication");
-	var UIAlertView = tools.importClass("UIAlertView");
-	
-	var vc = KSJSTestController.alloc().init();
-	vc.setUrl("https://github.com/kinsunlu/KSWebView/blob/master/README.md");
-	
-	var nav = UIApplication.sharedApplication().keyWindow().rootViewController();
-	nav.pushViewControlleranimated(vc, true);			
-	
-	var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示","该页面调用代码没有任何一句OC语句完全由JS实现",null,"关闭",null);
-	alert.show();
-	window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
-}
-    </script>
+    function viewDidAppearOnApp(params) {//无需注册,当前页面显示时调用
+        document.getElementById("label1").innerText = '当前网页已经在App屏幕中了';
+    }
 
+    function viewDidDisappearOnApp(params) {//无需注册,当前页面消失时调用
+        document.getElementById("label2").innerText = '当前网页已经不在App屏幕中了';
+    }
+
+    function importClass(className) {
+        //先导入要用到的OC类
+        var tools = window.OCTools;
+        var KSJSTestController = tools.importClass("KSJSTestController");
+        var UIApplication = tools.importClass("UIApplication");
+        var UIAlertView = tools.importClass("UIAlertView");
+
+        var vc = KSJSTestController.alloc().init();
+        vc.setUrl("https://github.com/kinsunlu/KSWebView/blob/master/README.md");
+
+        var nav = UIApplication.sharedApplication().keyWindow().rootViewController();
+        nav.pushViewControlleranimated(vc, true);
+
+        var alert = UIAlertView.alloc().initWithTitlemessagedelegatecancelButtonTitleotherButtonTitles("提示", "该页面调用代码没有任何一句OC语句完全由JS实现", null, "关闭", null);
+        alert.show();
+        window.OCTools.releaseObjects();//调用完毕后为了防止内存溢出必须释放
+    }
+
+</script>

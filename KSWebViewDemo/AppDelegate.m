@@ -8,11 +8,6 @@
 
 #import "AppDelegate.h"
 #import "KSMainViewController.h"
-#import "KSWebViewMemoryManager.h"
-
-@interface AppDelegate ()
-
-@end
 
 @implementation AppDelegate
 
@@ -25,11 +20,6 @@
     [window makeKeyAndVisible];
     _window = window;
     return YES;
-}
-
-- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {
-    //此方法可以在内存警告时迅速释放所有没有引用的webView
-    [KSWebViewMemoryManager releaseAllWebView];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

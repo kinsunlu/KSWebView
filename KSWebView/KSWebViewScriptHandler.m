@@ -9,7 +9,7 @@
 
 @implementation KSWebViewScriptHandler
 
--(instancetype)initWithTarget:(id)target action:(SEL)action {
+- (instancetype)initWithTarget:(id)target action:(SEL)action {
     if (self = [super init]) {
         _target = target;
         _action = action;
@@ -17,8 +17,8 @@
     return self;
 }
 
-+(instancetype)scriptHandlerWithTarget:(id)target action:(SEL)action {
-    return [[self alloc]initWithTarget:target action:action];
++ (instancetype)scriptHandlerWithTarget:(id)target action:(SEL)action {
+    return [[self alloc] initWithTarget:target action:action];
 }
 
 @end

@@ -5,31 +5,14 @@
 //  Copyright © 2018年 kinsun. All rights reserved.
 //
 
-#import "KSConstants.h"
 #import "KSWebViewController.h"
 
 @implementation KSWebViewController {
     BOOL _isTerminateWebView;
 }
+@dynamic view;
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self applicationWillEnterForeground];
-}
-
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    [_webView evaluateJavaScriptMethod:k_WebViewDidAppear completionHandler:nil];
-}
-
--(void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    KSWebView *webView = _webView;
-    [webView pausePlayingVideo];
-    [webView evaluateJavaScriptMethod:k_WebViewDidDisappear completionHandler:nil];
-}
-
--(void)loadView {
+- (void)loadView {
     [super loadView];
     _isTerminateWebView = NO;
     KSWebView *webView = [self loadWebView];
@@ -39,26 +22,45 @@
             weakSelf.title = title;
         }
     }];
-    _webView = webView;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
+    self.view = webView;
+}
+
+- (KSWebView *)loadWebView {
+    return [KSWebView.alloc initWithScriptHandlers:self.loadScriptHandlers];
+}
+
+- (NSDictionary <NSString *, KSWebViewScriptHandler *> *)loadScriptHandlers {
+    return nil;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"正在加载...";
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
--(KSWebView*)loadWebView {
-    KSWebView *webView = [KSWebView safelyReleaseWebViewWithFrame:self.view.frame delegate:self];
-    self.view = webView;
-    return webView;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self applicationWillEnterForeground];
 }
 
--(void)startWebViewRequest {
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self.view evaluateJavaScript:k_WebViewDidAppear completionHandler:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    KSWebView *webView = self.view;
+    [webView pausePlayingVideo];
+    [webView evaluateJavaScript:k_WebViewDidDisappear completionHandler:nil];
+}
+
+- (void)startWebViewRequest {
     if (_url.length != 0) {
-        [_webView loadWebViewWithURL:_url params:_params];
+        [self.view loadWebViewWithURL:_url params:_params];
     } else if (_filePath.length != 0) {
-        [_webView loadWebViewWithFilePath:_filePath];
+        [self.view loadWebViewWithFilePath:_filePath];
     }
 }
 
@@ -66,22 +68,24 @@
 
 - (void)webView:(KSWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     NSLog(@"error=%@",error.localizedDescription);
-    [webView resetProgressView];
+    [webView resetProgressLayer];
 }
 
 - (void)webViewWebContentProcessDidTerminate:(KSWebView *)webView {
     _isTerminateWebView = YES;
 }
 
--(void)applicationWillEnterForeground {
+- (void)applicationWillEnterForeground {
     if (_isTerminateWebView) {
         _isTerminateWebView = NO;
         [self loadWebView];
     }
 }
 
--(void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+- (void)dealloc {
+    if (self.viewIfLoaded) {
+        [NSNotificationCenter.defaultCenter removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+    }
 }
 
 @end
