@@ -11,14 +11,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+FOUNDATION_EXPORT NSString * const __ks_initJavaScriptString;
 FOUNDATION_EXTERN size_t __ks_lengthFromType(const char *type);
 FOUNDATION_EXTERN NSNumber *_Nullable __ks_numberFromInvocation(NSInvocation *invocation, size_t length, const char *type);
 
 @class KSWebViewScriptHandler;
 @interface KSOCObjectTools : NSObject
 
-@property (nonatomic, readonly, copy, class) NSString *initJavaScriptString;
-@property (nonatomic, readonly, class) NSDictionary <NSString*, KSWebViewScriptHandler*>*scriptHandlers;
+@property (nonatomic, copy, readonly) NSDictionary <NSString*, KSWebViewScriptHandler*>*scriptHandlers;
+
+@property (nonatomic, readonly, class) KSOCObjectTools *sharedTools;
 
 @end
 

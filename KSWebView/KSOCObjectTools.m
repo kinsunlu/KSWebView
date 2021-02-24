@@ -103,7 +103,7 @@
 
 @end
 
-static NSString * k_initJavaScriptString = @"window.OCTools=function(){var tools={};tools['importClass']=window.__ksImportClass;tools['releaseObjects']=window.android.__ks_releaseObjects;tools.OCClass={};return tools}();function __ksInvokeOCObject(value,k_arguments,isClass){if(isClass){this.className=value}else{this.objKey=value}this.funcName=k_arguments.callee.__ks_funcName;this.params=Array.prototype.slice.call(k_arguments)}function __ksImportClass(classString){var occlass=window.OCTools.OCClass;var oc_class_obj=occlass[classString];if(oc_class_obj===null||oc_class_obj===undefined){var obj=window.android.__ks_importClass(classString);var oc_instance=obj.instance;function ks_oc_object(objKey){this.__ks_objKey=objKey}var instance_prototype=ks_oc_object.prototype;for(var i in oc_instance){var item=oc_instance[i];function func(){var objKey=this.__ks_objKey;var value=new __ksInvokeOCObject(objKey,arguments,false);return __ksInvokeOCMethod(value)}func.__ks_funcName=item;instance_prototype[item]=func}var oc_class=obj.class;function ks_oc_class(className,instanceMethod){this.__ks_className=className;this.__ks_instance_method=instanceMethod}var class_prototype=ks_oc_class.prototype;for(var i in oc_class){var item=oc_class[i];function func(){var className=this.__ks_className;var value=new __ksInvokeOCObject(className,arguments,true);return __ksInvokeOCMethod(value)}func.__ks_funcName=item;class_prototype[item]=func}oc_class_obj=new ks_oc_class(classString,ks_oc_object);occlass[classString]=oc_class_obj}return oc_class_obj}function __ksGetMethodReturn(oc_class,objKey){var oc_instance_obj;if(oc_class!==undefined&&oc_class!==null){var oc_instance=oc_class.__ks_instance_method;oc_instance_obj=new oc_instance(objKey)}else{oc_instance_obj=new Object;oc_instance_obj.__ks_objKey=objKey}return oc_instance_obj}function __ksInvokeOCMethod(value){var returnData=window.android.__ks_invokeMethod(value);if(returnData!==undefined&&returnData!==null){var type=returnData.type;switch(type){case'object':{var tools=window.OCTools;var occlass=tools.OCClass;var returnClass=returnData.className;var k_class=occlass[returnClass];if(k_class===null||k_class===undefined){k_class=tools.importClass(returnClass);occlass[returnClass]=k_class}var returnObj=returnData.objKey;var k_obj=__ksGetMethodReturn(k_class,returnObj);return k_obj}case'other':{var returnObj=returnData.objKey;var k_obj=__ksGetMethodReturn(null,returnObj);return k_obj}default:return returnData.value}}}";
+NSString * const __ks_initJavaScriptString = @"window.OCTools={'importClass':window.__ks__importClass,'releaseObjects':window.android.__ks_releaseObjects,'OCClass':{},};function __ks__invokeOCObject(value,k_arguments,isClass){if(isClass){this.className=value}else{this.objKey=value}this.funcName=k_arguments.callee.__ks_funcName;this.params=Array.prototype.slice.call(k_arguments)}function __ks__importClass(classString){var occlass=window.OCTools.OCClass;var oc_class_obj=occlass[classString];if(oc_class_obj===null||oc_class_obj===undefined){var obj=window.android.__ks_importClass(classString);var oc_instance=obj.instance;function ks_oc_object(objKey){this.__ks_objKey=objKey}var instance_prototype=ks_oc_object.prototype;for(var i in oc_instance){var item=oc_instance[i];function func(){var objKey=this.__ks_objKey;var value=new __ks__invokeOCObject(objKey,arguments,false);return __ks__invokeOCMethod(value)}func.__ks_funcName=item;instance_prototype[item]=func}var oc_class=obj.class;function ks_oc_class(className,instanceMethod){this.__ks_className=className;this.__ks_instance_method=instanceMethod}var class_prototype=ks_oc_class.prototype;for(var i in oc_class){var item=oc_class[i];function func(){var className=this.__ks_className;var value=new __ks__invokeOCObject(className,arguments,true);return __ks__invokeOCMethod(value)}func.__ks_funcName=item;class_prototype[item]=func}oc_class_obj=new ks_oc_class(classString,ks_oc_object);occlass[classString]=oc_class_obj}return oc_class_obj}function __ks__getMethodReturn(oc_class,objKey){var oc_instance_obj;if(oc_class!==undefined&&oc_class!==null){var oc_instance=oc_class.__ks_instance_method;oc_instance_obj=new oc_instance(objKey)}else{oc_instance_obj=new Object;oc_instance_obj.__ks_objKey=objKey}return oc_instance_obj}function __ks__invokeOCMethod(value){var returnData=window.android.__ks_invokeMethod(value);if(returnData!==undefined&&returnData!==null){var type=returnData.type;switch(type){case'object':{var tools=window.OCTools;var occlass=tools.OCClass;var returnClass=returnData.className;var k_class=occlass[returnClass];if(k_class===null||k_class===undefined){k_class=tools.importClass(returnClass);occlass[returnClass]=k_class}var returnObj=returnData.objKey;var k_obj=__ks__getMethodReturn(k_class,returnObj);return k_obj}case'other':{var returnObj=returnData.objKey;var k_obj=__ks__getMethodReturn(null,returnObj);return k_obj}default:return returnData.value}}}";
 
 size_t __ks_lengthFromType(const char *type) {
     if (strcmp(type, @encode(int)) == 0) {
@@ -176,37 +176,31 @@ NSNumber * __ks_numberFromInvocation(NSInvocation *invocation, size_t length, co
     return nil;
 }
 
-NSString * const k_colon            = @":";
-NSString * const k_empty            = @"";
-NSString * const k_location_format  = @"%p";
-NSString * const k_class            = @"class";
-NSString * const k_instance         = @"instance";
-NSString * const k_objKey           = @"objKey";
-NSString * const k_js_objKey        = @"__ks_objKey";
-NSString * const k_className        = @"className";
-NSString * const k_value            = @"value";
-NSString * const k_type             = @"type";
-NSString * const k_other            = @"other";
-NSString * const k_object           = @"object";
-NSString * const k_base             = @"base";
+static NSString * const __ks__colon             = @":";
+static NSString * const __ks__empty             = @"";
+static NSString * const __ks__location_format   = @"%p";
+static NSString * const __ks__class             = @"class";
+static NSString * const __ks__instance          = @"instance";
+static NSString * const __ks__objKey            = @"objKey";
+static NSString * const __ks__js_objKey         = @"__ks_objKey";
+static NSString * const __ks__className         = @"className";
+static NSString * const __ks__value             = @"value";
+static NSString * const __ks__type              = @"type";
+static NSString * const __ks__other             = @"other";
+static NSString * const __ks__object            = @"object";
+static NSString * const __ks__base              = @"base";
 
 #import <WebKit/WKScriptMessage.h>
 #import "KSWebViewScriptHandler.h"
 
-@interface KSOCObjectTools ()
+@implementation KSOCObjectTools {
+    NSMapTable <NSString *, _KSOCClassInfoModel *> *_catalog;
+    NSLock *_catalogLock;
+    NSMapTable <NSString *, _KSOCObject *> *_objectPool;
+    NSLock *_objectPoolLock;
+}
 
-@property (nonatomic, strong, readonly) NSMapTable <NSString *, _KSOCClassInfoModel*>*catalog;
-@property (nonatomic, readonly, copy) NSString *catalogLockToken;
-@property (nonatomic, strong, readonly) NSMapTable <NSString *, _KSOCObject*>*objectPool;
-@property (nonatomic, readonly, copy) NSString *objectPoolLockToken;
-
-@end
-
-@implementation KSOCObjectTools
-@synthesize catalog = _catalog, objectPool = _objectPool,
-catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken;
-
-+ (instancetype)share {
++ (instancetype)sharedTools {
     static KSOCObjectTools *_instance = nil;
     if (_instance == nil) {
         static dispatch_once_t onceToken;
@@ -217,42 +211,55 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
     return _instance;
 }
 
-+ (NSDictionary *)scriptHandlerImportClass:(NSString *)className {
+- (instancetype)init {
+    if (self = [super init]) {
+        _catalog = NSMapTable.strongToStrongObjectsMapTable;
+        _catalogLock = NSLock.alloc.init;
+        _objectPool = NSMapTable.strongToStrongObjectsMapTable;
+        _objectPoolLock = NSLock.alloc.init;
+        
+        KSWebViewScriptHandler *importClass = [KSWebViewScriptHandler.alloc initWithTarget:self action:@selector(scriptHandlerImportClass:)];
+        KSWebViewScriptHandler *invokeMethod = [KSWebViewScriptHandler.alloc initWithTarget:self action:@selector(scriptHandlerInvokeClassMethod:)];
+        KSWebViewScriptHandler *releaseObjects = [KSWebViewScriptHandler.alloc initWithTarget:self action:@selector(releaseObjects)];
+        _scriptHandlers = @{@"__ks_importClass": importClass, @"__ks_invokeMethod": invokeMethod, @"__ks_releaseObjects": releaseObjects};
+    }
+    return self;
+}
+
+- (NSDictionary *)scriptHandlerImportClass:(NSString *)className {
     if (className != nil && className.length != 0) {
         Class class = NSClassFromString(className);
         if (class != nil) {
-            KSOCObjectTools *tools = KSOCObjectTools.share;
-            NSMapTable <NSString *,_KSOCClassInfoModel*>*catalog = tools.catalog;
             NSMutableSet <NSString*>* classMethodNameArray = NSMutableSet.set;
             NSMutableSet <NSString*>* instanceMethodNameArray = NSMutableSet.set;
             while (class != nil) {
                 NSString *classNameKey = NSStringFromClass(class);
-                _KSOCClassInfoModel *info = [catalog objectForKey:classNameKey];
+                _KSOCClassInfoModel *info = [_catalog objectForKey:classNameKey];
                 if (info == nil) {
                     info = [self methodFromClass:class];
-                    @synchronized (tools.catalogLockToken) {
-                        [catalog setObject:info forKey:classNameKey];
-                    }
+                    [_catalogLock lock];
+                    [_catalog setObject:info forKey:classNameKey];
+                    [_catalogLock unlock];
                 }
                 [classMethodNameArray addObjectsFromArray:info.classMethod.allKeys];
                 [instanceMethodNameArray addObjectsFromArray:info.instanceMethod.allKeys];
                 class = [class superclass];
             }
-            NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:classMethodNameArray.allObjects, k_class, instanceMethodNameArray.allObjects, k_instance, nil];
+            NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:classMethodNameArray.allObjects, __ks__class, instanceMethodNameArray.allObjects, __ks__instance, nil];
             return dict;
         }
     }
     return nil;
 }
 
-+ (_KSOCClassInfoModel *)methodFromClass:(Class)class {
+- (_KSOCClassInfoModel *)methodFromClass:(Class)class {
     NSMutableDictionary <NSString *,_KSOCMethodModel *>* instanceMethod = [NSMutableDictionary dictionary];
     unsigned int count;
     Method *instance_methods = class_copyMethodList(class, &count);
     for (int i = 0; i < count; i++) {
         Method method = instance_methods[i];
         _KSOCMethodModel *model = [_KSOCMethodModel.alloc initWithMethod:method classMethod:NO];
-        NSString *key = [model.selectorString stringByReplacingOccurrencesOfString:k_colon withString:k_empty];
+        NSString *key = [model.selectorString stringByReplacingOccurrencesOfString:__ks__colon withString:__ks__empty];
         [instanceMethod setValue:model forKey:key];
     }
     NSMutableDictionary <NSString *,_KSOCMethodModel *>* classMethod = [NSMutableDictionary dictionary];
@@ -261,7 +268,7 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
     for (int i = 0; i < count; i++) {
         Method method = class_methods[i];
         _KSOCMethodModel *model = [_KSOCMethodModel.alloc initWithMethod:method classMethod:YES];
-        NSString *key = [model.selectorString stringByReplacingOccurrencesOfString:k_colon withString:k_empty];
+        NSString *key = [model.selectorString stringByReplacingOccurrencesOfString:__ks__colon withString:__ks__empty];
         [classMethod setValue:model forKey:key];
     }
     _KSOCClassInfoModel *model = _KSOCClassInfoModel.alloc.init;
@@ -270,28 +277,26 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
     return model;
 }
 
-+ (NSDictionary *)scriptHandlerInvokeClassMethod:(NSDictionary *)params {
+- (NSDictionary *)scriptHandlerInvokeClassMethod:(NSDictionary *)params {
     if (params != nil && params.count != 0) {
         _KSOCInvokeModel *model = [_KSOCInvokeModel.alloc initWithDictionary:params];
         NSString *funcName = model.funcName;
         NSString *className = model.className;
         NSString *objKey = model.objKey;
-        KSOCObjectTools *tools = KSOCObjectTools.share;
-        NSMapTable <NSString *, _KSOCObject*>*objectPool = tools.objectPool;
         SEL selector = nil;
         id target = nil;
         NSMethodSignature *signature = nil;
         if (className != nil && className.length != 0) {
             Class class = NSClassFromString(model.className);
-            _KSOCMethodModel *obj_model = [self searchClass:class isClass:YES method:funcName inCatalog:tools.catalog];
+            _KSOCMethodModel *obj_model = [self searchClass:class isClass:YES method:funcName inCatalog:_catalog];
             selector = obj_model.selector;
             signature = [class methodSignatureForSelector:selector];
             target = class;
         } else if (objKey != nil && objKey.length != 0) {
-            _KSOCObject *obj = [objectPool objectForKey:objKey];
+            _KSOCObject *obj = [_objectPool objectForKey:objKey];
             target = obj.objectValue;
             Class class = [target class];
-            _KSOCMethodModel *obj_model = [self searchClass:class isClass:NO method:funcName inCatalog:tools.catalog];
+            _KSOCMethodModel *obj_model = [self searchClass:class isClass:NO method:funcName inCatalog:_catalog];
             selector = obj_model.selector;
             signature = [class instanceMethodSignatureForSelector:selector];
         }
@@ -306,9 +311,9 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
                     param = nil;
                 } else if ([param isKindOfClass:NSDictionary.class]) {
                     NSDictionary *dict = param;
-                    NSString *objKey = [dict objectForKey:k_js_objKey];
+                    NSString *objKey = [dict objectForKey:__ks__js_objKey];
                     if (objKey != nil) {
-                        _KSOCObject *obj = [objectPool objectForKey:objKey];
+                        _KSOCObject *obj = [_objectPool objectForKey:objKey];
                         if (obj.isObject) {
                             param = obj.objectValue;
                         } else {
@@ -337,29 +342,29 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
                     [invocation getReturnValue:&temp];
                     id returnValue = (__bridge id)temp;
                     if ([returnValue isKindOfClass:NSString.class] || [returnValue isKindOfClass:NSValue.class]) {
-                        returnData = @{k_type: k_base, k_value: returnValue};
+                        returnData = @{__ks__type: __ks__base, __ks__value: returnValue};
                     } else {
                         _KSOCObject *returnObj = [_KSOCObject objectFromValue:returnValue];
-                        NSString *key = [NSString stringWithFormat:k_location_format, returnValue];
-                        @synchronized (tools.objectPoolLockToken) {
-                            [objectPool setObject:returnObj forKey:key];
-                        }
-                        returnData = @{k_type: k_object, k_className: NSStringFromClass([returnValue class]), k_objKey: key};
+                        NSString *key = [NSString stringWithFormat:__ks__location_format, returnValue];
+                        [_objectPoolLock lock];
+                        [_objectPool setObject:returnObj forKey:key];
+                        [_objectPoolLock unlock];
+                        returnData = @{__ks__type: __ks__object, __ks__className: NSStringFromClass([returnValue class]), __ks__objKey: key};
                     }
                 } else {
                     size_t length = signature.methodReturnLength;
                     NSNumber *value = __ks_numberFromInvocation(invocation, length, returnType);
                     if (value != nil) {
-                        returnData = @{k_type: k_base, k_value: value};
+                        returnData = @{__ks__type: __ks__base, __ks__value: value};
                     } else {
                         void *buffer = (void *)malloc(length);
                         [invocation getReturnValue:buffer];
                         _KSOCObject *returnObj = [_KSOCObject locationFromValue:buffer];
-                        NSString *key = [NSString stringWithFormat:k_location_format, buffer];
-                        @synchronized (tools.objectPoolLockToken) {
-                            [objectPool setObject:returnObj forKey:key];
-                        }
-                        returnData = @{k_type: k_other, k_objKey: key};
+                        NSString *key = [NSString stringWithFormat:__ks__location_format, buffer];
+                        [_objectPoolLock lock];
+                        [_objectPool setObject:returnObj forKey:key];
+                        [_objectPoolLock unlock];
+                        returnData = @{__ks__type: __ks__other, __ks__objKey: key};
                     }
                 }
                 return returnData;
@@ -369,7 +374,7 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
     return nil;
 }
 
-+ (_KSOCMethodModel *)searchClass:(Class)class isClass:(BOOL)isclass method:(NSString *)methodString inCatalog:(NSMapTable <NSString *, _KSOCClassInfoModel*> *)catalog {
+- (_KSOCMethodModel *)searchClass:(Class)class isClass:(BOOL)isclass method:(NSString *)methodString inCatalog:(NSMapTable <NSString *, _KSOCClassInfoModel*> *)catalog {
     _KSOCClassInfoModel *info = [catalog objectForKey:NSStringFromClass(class)];
     _KSOCMethodModel *model = isclass ? [info.classMethod objectForKey:methodString] : [info.instanceMethod objectForKey:methodString];
     if (model != nil) {
@@ -379,55 +384,10 @@ catalogLockToken = _catalogLockToken, objectPoolLockToken = _objectPoolLockToken
     }
 }
 
-+ (void)releaseObjects {
-    KSOCObjectTools *tools = [KSOCObjectTools share];
-    @synchronized (tools.objectPoolLockToken) {
-        [tools.objectPool removeAllObjects];
-    }
-}
-
-+ (NSString *)initJavaScriptString {
-    return k_initJavaScriptString;
-}
-
-+ (NSDictionary<NSString *,KSWebViewScriptHandler *> *)scriptHandlers {
-    static NSDictionary *k_scriptHandlers = nil;
-    if (k_scriptHandlers == nil) {
-        Class class = self.class;
-        KSWebViewScriptHandler *importClass = [KSWebViewScriptHandler.alloc initWithTarget:class action:@selector(scriptHandlerImportClass:)];
-        KSWebViewScriptHandler *invokeMethod = [KSWebViewScriptHandler.alloc initWithTarget:class action:@selector(scriptHandlerInvokeClassMethod:)];
-        KSWebViewScriptHandler *releaseObjects = [KSWebViewScriptHandler.alloc initWithTarget:class action:@selector(releaseObjects)];
-        k_scriptHandlers = @{@"__ks_importClass": importClass, @"__ks_invokeMethod": invokeMethod, @"__ks_releaseObjects": releaseObjects};
-    }
-    return k_scriptHandlers;
-}
-
-- (NSMapTable<NSString *, _KSOCClassInfoModel*> *)catalog {
-    if (_catalog == nil) {
-        _catalog = [NSMapTable strongToStrongObjectsMapTable];
-    }
-    return _catalog;
-}
-
-- (NSMapTable<NSString *,_KSOCObject*> *)objectPool {
-    if (_objectPool == nil) {
-        _objectPool = [NSMapTable strongToStrongObjectsMapTable];
-    }
-    return _objectPool;
-}
-
-- (NSString *)catalogLockToken {
-    if (_catalogLockToken == nil) {
-        _catalogLockToken = [NSString stringWithFormat:@"catalogLockToken"];
-    }
-    return _catalogLockToken;
-}
-
-- (NSString *)objectPoolLockToken {
-    if (_objectPoolLockToken == nil) {
-        _objectPoolLockToken = [NSString stringWithFormat:@"objectPoolLockToken"];
-    }
-    return _objectPoolLockToken;
+- (void)releaseObjects {
+    [_objectPoolLock lock];
+    [_objectPool removeAllObjects];
+    [_objectPoolLock unlock];
 }
 
 @end

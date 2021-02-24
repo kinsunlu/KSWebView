@@ -46,14 +46,14 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.view evaluateJavaScript:k_WebViewDidAppear completionHandler:nil];
+    [self.view evaluateJavaScript:_ks_WebViewDidAppear completionHandler:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     KSWebView *webView = self.view;
     [webView pausePlayingVideo];
-    [webView evaluateJavaScript:k_WebViewDidDisappear completionHandler:nil];
+    [webView evaluateJavaScript:_ks_WebViewDidDisappear completionHandler:nil];
 }
 
 - (void)startWebViewRequest {

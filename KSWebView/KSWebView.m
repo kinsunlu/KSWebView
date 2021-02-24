@@ -13,7 +13,7 @@
 
 @end
 
-static NSString * const k_WebViewBridgeIndexKey = @"__ks_web_bridge_";
+static NSString * const __ks__WebViewBridgeIndexKey = @"__ks_web_bridge_";
 
 @interface __KSWebViewUIDelegatePuppet : NSObject <WKUIDelegate>
 
@@ -38,9 +38,9 @@ static NSString * const k_WebViewBridgeIndexKey = @"__ks_web_bridge_";
 }
 
 - (void)webView:(KSWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)body initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString * result))completionHandler {
-    NSString *prefix = k_WebViewBridgeIndexKey;
+    NSString *prefix = __ks__WebViewBridgeIndexKey;
     if ([prompt hasPrefix:prefix]) {
-        [webView _runJavaScriptTextInputPanelWithPrompt:prompt defaultText:body initiatedByFrame:frame completionHandler:completionHandler];
+        [webView _runJavaScriptTextInputPanelWithPrompt:[prompt substringFromIndex:prefix.length] defaultText:body initiatedByFrame:frame completionHandler:completionHandler];
     } else if (_delegate != nil && [_delegate respondsToSelector:_cmd]) {
         [_delegate webView:webView runJavaScriptTextInputPanelWithPrompt:prompt defaultText:body initiatedByFrame:frame completionHandler:completionHandler];
     } else completionHandler(nil);
@@ -52,16 +52,16 @@ static NSString * const k_WebViewBridgeIndexKey = @"__ks_web_bridge_";
 #import "KSOCObjectTools.h"
 #import "KSHelper.h"
 
-static NSString * const k_EstimatedProgress = @"estimatedProgress";
-static NSString * const k_WebViewTitle      = @"title";
-static NSString * const k_GetVideoTag       = @"document.getElementsByTagName('video')";
+static NSString * const __ks__EstimatedProgress = @"estimatedProgress";
+static NSString * const __ks__WebViewTitle      = @"title";
+static NSString * const __ks__GetVideoTag       = @"document.getElementsByTagName('video')";
 
-NSString * const k_BlankPage                = @"about:blank";
-NSString * const k_WebViewDidAppear         = @"viewDidAppearOnApp()";
-NSString * const k_WebViewDidDisappear      = @"viewDidDisappearOnApp()";
+NSString * const _ks_BlankPage              = @"about:blank";
+NSString * const _ks_WebViewDidAppear       = @"viewDidAppearOnApp()";
+NSString * const _ks_WebViewDidDisappear    = @"viewDidDisappearOnApp()";
 
-static NSString * const k_questionMark      = @"?";
-static NSString * const k_andMark           = @"&";
+static NSString * const __ks__questionMark  = @"?";
+static NSString * const __ks__andMark       = @"&";
 
 @implementation KSWebView {
     __weak UIImageView *_screenshotView;
@@ -74,31 +74,30 @@ static NSString * const k_andMark           = @"&";
 }
 
 - (instancetype)initWithScriptHandlers:(NSDictionary<NSString *,KSWebViewScriptHandler *> *)scriptHandlers {
-    WKWebViewConfiguration *configuration = WKWebViewConfiguration.alloc.init;
-    configuration.allowsInlineMediaPlayback = NO;
-    configuration.preferences.javaScriptEnabled = YES; //允许与js进行交互
-    return [self initWithFrame:CGRectZero configuration:configuration scriptHandlers:scriptHandlers];
+    return [self initWithFrame:CGRectZero configuration:WKWebViewConfiguration.alloc.init scriptHandlers:scriptHandlers];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame configuration:(WKWebViewConfiguration *)configuration scriptHandlers:(NSDictionary <NSString *, KSWebViewScriptHandler *> *)scriptHandlers {
     if (self = [super initWithFrame:frame configuration:configuration]) {
         _jsObserveMap = NSMapTable.strongToStrongObjectsMapTable;
         
-        NSMutableDictionary *s = [NSMutableDictionary dictionaryWithDictionary:KSOCObjectTools.scriptHandlers];
-        [s addEntriesFromDictionary:scriptHandlers];
+        NSMutableDictionary *s = [NSMutableDictionary dictionaryWithDictionary:KSOCObjectTools.sharedTools.scriptHandlers];
         [s addEntriesFromDictionary:self.observerScriptHandlers];
-        _scriptHandlers = s;
+        if (scriptHandlers != nil) {
+            [s addEntriesFromDictionary:scriptHandlers];
+        }
+        _scriptHandlers = s.copy;
         
         WKUserContentController *userContentController = configuration.userContentController;
         NSMutableString *scriptString = NSMutableString.string;
         for (NSString *funcName in s.allKeys) {
-            [scriptString appendFormat:@"android['%@']=function(){var array=[].slice.call(arguments);var returnString=prompt('__ks_web_bridge_%@',JSON.stringify(array));if(returnString==null){return null}try{return JSON.parse(returnString)}catch(e){return returnString}};", funcName, funcName];
+            [scriptString appendFormat:@"'%@':function(){var a=[].slice.call(arguments);var r=prompt('__ks_web_bridge_%@',JSON.stringify(a));if(r==null){return null}var k=JSON.parse(r);var e=k.__ks__error;if(e!=undefined||e!=null){throw Error(e)}else{return k}},", funcName, funcName];
         }
-        NSString *s1 = [NSString stringWithFormat:@"window.android=function(){var android={};%@return android}();", scriptString];
+        NSString *s1 = [NSString stringWithFormat:@"window.android={%@};", scriptString];
         WKUserScript *script = [WKUserScript.alloc initWithSource:s1 injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
         [userContentController addUserScript:script];
         
-        WKUserScript *ocScript = [WKUserScript.alloc initWithSource:KSOCObjectTools.initJavaScriptString injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
+        WKUserScript *ocScript = [WKUserScript.alloc initWithSource:__ks_initJavaScriptString injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
         [userContentController addUserScript:ocScript];
         
         _puppet = __KSWebViewUIDelegatePuppet.alloc;
@@ -126,8 +125,8 @@ static NSString * const k_andMark           = @"&";
         _progressLayer = progressLayer;
 
         NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld;
-        [self addObserver:self forKeyPath:k_EstimatedProgress options:options context:NULL];
-        [self addObserver:self forKeyPath:k_WebViewTitle options:options context:NULL];
+        [self addObserver:self forKeyPath:__ks__EstimatedProgress options:options context:NULL];
+        [self addObserver:self forKeyPath:__ks__WebViewTitle options:options context:NULL];
     }
     return self;
 }
@@ -147,38 +146,29 @@ static NSString * const k_andMark           = @"&";
 }
 
 - (void)_runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)body initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString * result))completionHandler {
-    NSString *name = [prompt substringFromIndex:k_WebViewBridgeIndexKey.length];
-    KSWebViewScriptHandler *handler = [_scriptHandlers objectForKey:name];
-    if (handler == nil) {
-        completionHandler([KSHelper errorJsonWithCode:-999 msg:@"客户端没有找到该方法"]);
-        return;
-    }
+    KSWebViewScriptHandler *handler = [_scriptHandlers objectForKey:prompt];
     id target = handler.target;
     SEL action = handler.action;
-    NSMethodSignature *signature = [target methodSignatureForSelector:action];
-    const char *returnType = signature.methodReturnType;
-    BOOL notHasReturnValue = !strcmp(returnType, @encode(void));
-    if (notHasReturnValue) {
-        completionHandler(nil);
-    }
-    if ([target respondsToSelector:action]) {
+    if (target != nil && action != nil && [target respondsToSelector:action]) {
+        NSMethodSignature *signature = [target methodSignatureForSelector:action];
         NSArray <id> *arguments = nil;
         if (body != nil && body.length > 0) {
             NSError *error = nil;
-            arguments = [NSJSONSerialization JSONObjectWithData:[body dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
+            arguments = [NSJSONSerialization JSONObjectWithData:[body dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
             if (error != nil) {
-                if (!notHasReturnValue) {
-                    completionHandler([KSHelper errorJsonWithError:error]);
-                }
+                completionHandler([KSHelper errorJsonWithError:error]);
                 return;
             }
             NSUInteger numberOfArguments = signature.numberOfArguments;
             if (arguments.count != numberOfArguments-2) {
-                if (!notHasReturnValue) {
-                    completionHandler([KSHelper errorJsonWithCode:-998 msg:@"客户端的参数个数与JS不匹配"]);
-                }
+                completionHandler([KSHelper errorJsonWithCode:-998 msg:[NSString stringWithFormat:@"方法：‘%@’，客户端的参数个数与JS不匹配", prompt]]);
                 return;
             }
+        }
+        const char *returnType = signature.methodReturnType;
+        BOOL returnVoid = strcmp(returnType, @encode(void)) == 0;
+        if (returnVoid) {
+            completionHandler(nil);
         }
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
         invocation.selector = action;
@@ -188,7 +178,9 @@ static NSString * const k_andMark           = @"&";
             if (arg == NSNull.null) {// 空
                 void *location = NULL;
                 [invocation setArgument:location atIndex:i+2];
-            } else if (strcmp(argType, @encode(id)) != 0) { // 基本数据类型
+            } else if (strcmp(argType, @encode(id)) == 0) { // 对象
+                [invocation setArgument:&arg atIndex:i+2];
+            } else { // 基本数据类型
                 NSNumber *number = arg;
                 size_t length = __ks_lengthFromType(number.objCType);
                 void *location = (void *)malloc(length);
@@ -198,30 +190,30 @@ static NSString * const k_andMark           = @"&";
                     [number getValue:location];
                 }
                 [invocation setArgument:location atIndex:i+2];
-            } else { // 对象
-                [invocation setArgument:&arg atIndex:i+2];
             }
         }
         [invocation invokeWithTarget:target];
-        if (!notHasReturnValue) {
-            if (strcmp(returnType, @encode(id))) {
-                size_t length = signature.methodReturnLength;
-                NSNumber *value = __ks_numberFromInvocation(invocation, length, returnType);
-                completionHandler([KSHelper jsonWithObject:value]);
-            } else {
+        if (!returnVoid) {
+            if (strcmp(returnType, @encode(id)) == 0) {
                 void *temp = nil;
                 [invocation getReturnValue:&temp];
                 completionHandler([KSHelper jsonWithObject:(__bridge id)temp]);
+            } else {
+                size_t length = signature.methodReturnLength;
+                NSNumber *value = __ks_numberFromInvocation(invocation, length, returnType);
+                completionHandler([KSHelper jsonWithObject:value]);
             }
         }
+    } else {
+        completionHandler([KSHelper errorJsonWithCode:-999 msg:[NSString stringWithFormat:@"客户端没有注册'%@'方法", prompt]]);
     }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if (object == self) {
-        if (keyPath == k_EstimatedProgress) {
+        if (keyPath == __ks__EstimatedProgress) {
             NSString *url = self.URL.absoluteString;
-            if (![url isEqualToString:k_BlankPage]) {
+            if (![url isEqualToString:_ks_BlankPage]) {
                 double estimatedProgress = self.estimatedProgress;
                 CGRect frame = _progressLayer.frame;
                 frame.size.width = self.frame.size.width*estimatedProgress;
@@ -237,7 +229,7 @@ static NSString * const k_andMark           = @"&";
                     }
                 }];
             }
-        } else if (_webViewTitleChangedCallback && keyPath == k_WebViewTitle) {
+        } else if (_webViewTitleChangedCallback && keyPath == __ks__WebViewTitle) {
             _webViewTitleChangedCallback(self.title);
         }
     } else {
@@ -278,9 +270,9 @@ static NSString * const k_andMark           = @"&";
     if (url != nil && url.length != 0) {
         if (params != nil) {
             NSMutableString *urlString = [NSMutableString stringWithString:url];
-            NSString *bridge = k_questionMark;
+            NSString *bridge = __ks__questionMark;
             if ([urlString rangeOfString:bridge].location != NSNotFound) {
-                bridge = k_andMark;
+                bridge = __ks__andMark;
             }
             NSMutableString *paramsStr = [NSMutableString stringWithString:bridge];
             NSArray <NSString *> *allKeys = params.allKeys;
@@ -289,7 +281,7 @@ static NSString * const k_andMark           = @"&";
                 NSString *value = [[params objectForKey:key] description];
                 [paramsStr appendFormat:@"%@=%@", key, value];
                 if (i != allKeys.count-1) {
-                    [paramsStr appendString:k_andMark];
+                    [paramsStr appendString:__ks__andMark];
                 }
             }
             [urlString appendString:paramsStr];
@@ -303,7 +295,7 @@ static NSString * const k_andMark           = @"&";
 
 - (void)loadWebViewWithFilePath:(NSString *)filePath {
     if (filePath != nil && filePath.length > 0) {
-        NSString *questionMark = k_questionMark;
+        NSString *questionMark = __ks__questionMark;
         NSArray <NSString*>*stringArray = [filePath componentsSeparatedByString:questionMark];
         NSURL *fileURL = nil;
         if (stringArray.count > 1) {
@@ -360,7 +352,7 @@ static NSString * const k_andMark           = @"&";
     }
 }
 
-- (void)scriptHandlerreInitDataStorage {
+- (void)_scriptHandlerreInitDataStorage {
     [KSWebDataStorageModule.sharedModule removeAllObjects];
 }
 
@@ -371,7 +363,7 @@ static NSString * const k_andMark           = @"&";
     KSWebViewScriptHandler *addObserver = [KSWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(_scriptHandlerAddObserverWithKey:callback:)];
     KSWebViewScriptHandler *removeObserver = [KSWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(_scriptHandlerRemoveObserverWithKey:)];
     KSWebViewScriptHandler *removeAllObserver = [KSWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(_scriptHandlerRemoveAllObserver)];
-    KSWebViewScriptHandler *reinit = [KSWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(scriptHandlerreInitDataStorage)];
+    KSWebViewScriptHandler *reinit = [KSWebViewScriptHandler scriptHandlerWithTarget:self action:@selector(_scriptHandlerreInitDataStorage)];
     return @{@"setKeyValues": setKeyValues, @"setValue": setValue, @"getValue": getValue, @"addObserver": addObserver, @"removeObserver": removeObserver, @"removeAllObserver": removeAllObserver, @"reinit": reinit};
 }
 
@@ -400,14 +392,14 @@ static NSString * const k_andMark           = @"&";
 }
 
 - (void)dealloc {
-    [self removeObserver:self forKeyPath:k_EstimatedProgress];
-    [self removeObserver:self forKeyPath:k_WebViewTitle];
+    [self removeObserver:self forKeyPath:__ks__EstimatedProgress];
+    [self removeObserver:self forKeyPath:__ks__WebViewTitle];
     [self _scriptHandlerRemoveAllObserver];
 }
 
 - (void)videoPlayerCount:(void (^)(NSInteger))callback {
     if (callback != nil) {
-        NSString * hasVideoTestString = [NSString stringWithFormat:@"%@.length",k_GetVideoTag];
+        NSString * hasVideoTestString = [NSString stringWithFormat:@"%@.length",__ks__GetVideoTag];
         [self evaluateJavaScript:hasVideoTestString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
             if (callback != nil) callback(result.unsignedIntegerValue);
         }];
@@ -419,7 +411,7 @@ static NSString * const k_andMark           = @"&";
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSInteger count) {
             if (index < count) {
-                NSString * durationString = [NSString stringWithFormat:@"%@[%td].duration.toFixed(1)", k_GetVideoTag, index];
+                NSString * durationString = [NSString stringWithFormat:@"%@[%td].duration.toFixed(1)", __ks__GetVideoTag, index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
                     if (callback != nil) callback(result.doubleValue);
                 }];
@@ -433,7 +425,7 @@ static NSString * const k_andMark           = @"&";
         __weak typeof(self) weakSelf = self;
         [self videoPlayerCount:^(NSInteger count) {
             if (index < count) {
-                NSString * durationString = [NSString stringWithFormat:@"%@[%td].currentTime.toFixed(1)", k_GetVideoTag, index];
+                NSString * durationString = [NSString stringWithFormat:@"%@[%td].currentTime.toFixed(1)", __ks__GetVideoTag, index];
                 [weakSelf evaluateJavaScript:durationString completionHandler:^(NSNumber *result, NSError * _Nullable error) {
                     if (callback != nil) callback(result.doubleValue);
                 }];
@@ -446,7 +438,7 @@ static NSString * const k_andMark           = @"&";
     __weak typeof(self) weakSelf = self;
     [self videoPlayerCount:^(NSInteger count) {
         if (index < count) {
-            NSString *playString = [NSString stringWithFormat:@"%@[%td].play()", k_GetVideoTag, index];
+            NSString *playString = [NSString stringWithFormat:@"%@[%td].play()", __ks__GetVideoTag, index];
             [weakSelf evaluateJavaScript:playString completionHandler:nil];
         }
     }];
@@ -456,7 +448,7 @@ static NSString * const k_andMark           = @"&";
     __weak typeof(self) weakSelf = self;
     [self videoPlayerCount:^(NSInteger count) {
         if (count > 0) {
-            NSString *pauseString = [NSString stringWithFormat:@"var dom = %@;for(var i = 0; i < dom.length; i++){dom[i].pause();}", k_GetVideoTag];
+            NSString *pauseString = [NSString stringWithFormat:@"var dom = %@;for(var i = 0; i < dom.length; i++){dom[i].pause();}", __ks__GetVideoTag];
             [weakSelf evaluateJavaScript:pauseString completionHandler:nil];
         }
     }];

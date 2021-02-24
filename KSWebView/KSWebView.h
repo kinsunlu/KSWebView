@@ -10,9 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT NSString * const k_BlankPage;
-FOUNDATION_EXPORT NSString * const k_WebViewDidAppear;
-FOUNDATION_EXPORT NSString * const k_WebViewDidDisappear;
+FOUNDATION_EXPORT NSString * const _ks_BlankPage;
+FOUNDATION_EXPORT NSString * const _ks_WebViewDidAppear;
+FOUNDATION_EXPORT NSString * const _ks_WebViewDidDisappear;
 
 @interface KSWebView : WKWebView
 

@@ -15,7 +15,7 @@
 }
 
 + (NSString *)errorJsonWithCode:(NSInteger)code msg:(NSString *)msg {
-    return [self jsonWithObject:@{@"code": @(code), @"msg": msg ?: @""}];
+    return [self jsonWithObject:@{@"__ks__error": [NSString stringWithFormat:@"error: %zd, reson: %@", code, msg]}];
 }
 
 + (NSString *)jsonWithObject:(id)object {
